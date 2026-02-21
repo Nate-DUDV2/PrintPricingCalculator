@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5F2ED10703E64C3FBA28F11FF09D38BE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_4F3922435DD44484AF0FFCD8BD0668A3"
         "MsmSig" = "8:_UNDEFINED"
@@ -62,6 +68,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -86,6 +100,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -147,6 +169,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5F2ED10703E64C3FBA28F11FF09D38BE"
+            {
+            "SourcePath" = "8:..\\PricingAppInstaller.ico"
+            "TargetName" = "8:PricingAppInstaller.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_CC3AC00DBEA64216A0DAE465E6BEFD95"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -177,7 +219,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_CC3AC00DBEA64216A0DAE465E6BEFD95"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][3BC Creations]\\[PrintPricingCalculator]"
+            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -202,9 +244,9 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:PricingApp"
+        "ProductName" = "8:3D Print Pricing Calculator"
         "ProductCode" = "8:{4F0B69E6-F781-41EE-ADF4-0FD8998E2931}"
-        "PackageCode" = "8:{5FF431AE-B4DE-4598-9B4B-8B6254152293}"
+        "PackageCode" = "8:{14E704F9-2EDD-469E-A86D-09658A9AEC07}"
         "UpgradeCode" = "8:{3907FCF8-9AA8-4057-BEE8-2F3578692D16}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -212,12 +254,12 @@
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:nate@dudv2.com"
+        "Manufacturer" = "8:Nates Print Shop"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:PricingApp"
+        "Title" = "8:3D Print Pricing Calculator"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:nate@dudv2.com"
+        "ARPCONTACT" = "8:Nates Print Shop"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
@@ -335,7 +377,7 @@
             "Target" = "8:_4F3922435DD44484AF0FFCD8BD0668A3"
             "Folder" = "8:_0A57B8D878174B258D1DFDBDAA93904D"
             "WorkingFolder" = "8:_CC3AC00DBEA64216A0DAE465E6BEFD95"
-            "Icon" = "8:"
+            "Icon" = "8:_5F2ED10703E64C3FBA28F11FF09D38BE"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_E3B2A7C7EC9141C5918ABD117DEE7B8D"
@@ -349,7 +391,7 @@
             "Target" = "8:_4F3922435DD44484AF0FFCD8BD0668A3"
             "Folder" = "8:_BE7C6D84E355479B8695FD42D664C417"
             "WorkingFolder" = "8:_CC3AC00DBEA64216A0DAE465E6BEFD95"
-            "Icon" = "8:"
+            "Icon" = "8:_5F2ED10703E64C3FBA28F11FF09D38BE"
             "Feature" = "8:"
             }
         }
