@@ -28,13 +28,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4F3922435DD44484AF0FFCD8BD0668A3"
+        "OwnerKey" = "8:_384FEAB88E769F78A9A988351C71EDDD"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_384FEAB88E769F78A9A988351C71EDDD"
+        "OwnerKey" = "8:_4F3922435DD44484AF0FFCD8BD0668A3"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -55,22 +55,6 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
-            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
-            {
-            "Enabled" = "11:TRUE"
-            "PromptEnabled" = "11:TRUE"
-            "PrerequisitesLocation" = "2:1"
-            "Url" = "8:"
-            "ComponentsUrl" = "8:"
-                "Items"
-                {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
-                    {
-                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
-                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
-                    }
-                }
-            }
         }
         "Release"
         {
@@ -87,14 +71,6 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
-            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
-            {
-            "Enabled" = "11:TRUE"
-            "PromptEnabled" = "11:TRUE"
-            "PrerequisitesLocation" = "2:1"
-            "Url" = "8:"
-            "ComponentsUrl" = "8:"
-            }
         }
     }
     "Deployable"
@@ -212,7 +188,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:PricingApp"
         "ProductCode" = "8:{4F0B69E6-F781-41EE-ADF4-0FD8998E2931}"
-        "PackageCode" = "8:{6B661392-E3C0-4A80-B75B-F1A8EFEA1513}"
+        "PackageCode" = "8:{5FF431AE-B4DE-4598-9B4B-8B6254152293}"
         "UpgradeCode" = "8:{3907FCF8-9AA8-4057-BEE8-2F3578692D16}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -220,12 +196,12 @@
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:nate@dudv2.com"
+        "Manufacturer" = "8:nathan_mgr@yahoo.com"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
         "Title" = "8:PricingApp"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:nate@dudv2.com"
+        "ARPCONTACT" = "8:nathan_mgr@yahoo.com"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
