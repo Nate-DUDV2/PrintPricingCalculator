@@ -1,7 +1,7 @@
 ﻿<Window x:Class="PrintPricingCalculator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="3D Print Pricing Calculator" Height="489.59" Width="850" Background="#F3F4F6">
+        Title="3D Print Pricing Calculator" Height="522.59" Width="850" Background="#F3F4F6">
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -68,6 +68,7 @@
         </StackPanel>
 
         <StackPanel Grid.Column="2" Margin="10,0,0,0">
+
             <TextBlock Text="📊 Results &amp; Pricing" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
             <TextBlock Text="Total Materials Cost:" Foreground="Gray"/>
@@ -91,5 +92,6 @@
             <TextBlock Text="Suggested 70% Margin Price:" Foreground="Gray"/>
             <TextBlock x:Name="lblMargin70" Text="$0.00" FontSize="18" FontWeight="Bold"/>
         </StackPanel>
+        <CheckBox x:Name="chkDarkMode" Content="🌙 Dark Mode" HorizontalAlignment="Right" FontWeight="Bold" Click="DarkMode_Click" Margin="0,377,92,27" Grid.Column="1"/>
     </Grid>
 </Window>
