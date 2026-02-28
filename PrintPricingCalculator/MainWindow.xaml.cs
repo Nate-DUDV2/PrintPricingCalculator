@@ -4,6 +4,10 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using Microsoft.Win32;
+using System.IO;
+using System.Text.Json;
+using System.Windows.Documents;
 
 namespace PrintPricingCalculator
 {
@@ -118,5 +122,156 @@ namespace PrintPricingCalculator
                 this.Resources.Remove(typeof(TextBox));
             }
         }
+
+
+        // This class holds all the data we want to save to the file
+        public class QuoteData
+        {
+            public string FileName { get; set; }
+            public string DesignerName { get; set; }
+            public string Efficiency { get; set; }
+            public string LaborRate { get; set; }
+            public string PrinterCost { get; set; }
+            public string Maintenance { get; set; }
+            public string Life { get; set; }
+            public string Uptime { get; set; }
+            public string Power { get; set; }
+            public string ElecCost { get; set; }
+            public string Buffer { get; set; }
+            public string FilamentCost { get; set; }
+            public string FilamentReq { get; set; }
+            public string PrintTime { get; set; }
+            public string LaborTime { get; set; }
+            public string HardwareCost { get; set; }
+            public string PackagingCost { get; set; }
+            public string Postage { get; set; }
+        }
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Gather all current text box values into our data object
+            QuoteData data = new QuoteData
+            {
+                FileName = txtFileName.Text,
+                DesignerName = txtDesignerName.Text,
+                Efficiency = txtEfficiency.Text,
+                LaborRate = txtLaborRate.Text,
+                PrinterCost = txtPrinterCost.Text,
+                Maintenance = txtMaintenance.Text,
+                Life = txtLife.Text,
+                Uptime = txtUptime.Text,
+                Power = txtPower.Text,
+                ElecCost = txtElecCost.Text,
+                Buffer = txtBuffer.Text,
+                FilamentCost = txtFilamentCost.Text,
+                FilamentReq = txtFilamentReq.Text,
+                PrintTime = txtPrintTime.Text,
+                LaborTime = txtLaborTime.Text,
+                HardwareCost = txtHardwareCost.Text,
+                PackagingCost = txtPackagingCost.Text,
+                Postage = txtPostage.Text
+            };
+
+            // 2. Open standard Windows Save File dialog
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "3D Print Quote (*.3dquote)|*.3dquote|JSON File (*.json)|*.json";
+            saveFileDialog.Title = "Save Pricing Quote";
+            saveFileDialog.FileName = txtFileName.Text + " - Quote"; // Default file name
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // 3. Convert data to text and save to hard drive!
+                string jsonString = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(saveFileDialog.FileName, jsonString);
+                MessageBox.Show("Quote saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void Load_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Open standard Windows Open File dialog
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "3D Print Quote (*.3dquote)|*.3dquote|JSON File (*.json)|*.json";
+            openFileDialog.Title = "Load Pricing Quote";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // 2. Read the file and convert it back to our data object
+                    string jsonString = File.ReadAllText(openFileDialog.FileName);
+                    QuoteData data = JsonSerializer.Deserialize<QuoteData>(jsonString);
+
+                    // 3. Fill the UI text boxes back up!
+                    txtFileName.Text = data.FileName;
+                    txtDesignerName.Text = data.DesignerName;
+                    txtEfficiency.Text = data.Efficiency;
+                    txtLaborRate.Text = data.LaborRate;
+                    txtPrinterCost.Text = data.PrinterCost;
+                    txtMaintenance.Text = data.Maintenance;
+                    txtLife.Text = data.Life;
+                    txtUptime.Text = data.Uptime;
+                    txtPower.Text = data.Power;
+                    txtElecCost.Text = data.ElecCost;
+                    txtBuffer.Text = data.Buffer;
+                    txtFilamentCost.Text = data.FilamentCost;
+                    txtFilamentReq.Text = data.FilamentReq;
+                    txtPrintTime.Text = data.PrintTime;
+                    txtLaborTime.Text = data.LaborTime;
+                    txtHardwareCost.Text = data.HardwareCost;
+                    txtPackagingCost.Text = data.PackagingCost;
+                    txtPostage.Text = data.Postage;
+
+                    // Automatically calculate pricing after loading
+                    Calculate_Click(null, null);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Could not load the file. It might be corrupted.\n\n" + ex.Message, "Error Loading File", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+
+        private void Print_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Open the standard Windows Print Dialog
+            PrintDialog printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                // 2. Build a clean "Invoice" document in memory
+                FlowDocument doc = new FlowDocument();
+                doc.PagePadding = new Thickness(50);
+                doc.FontFamily = new FontFamily("Segoe UI");
+
+                // Header
+                doc.Blocks.Add(new Paragraph(new Run("3D Print Pricing Quote")) { FontSize = 24, FontWeight = FontWeights.Bold });
+                doc.Blocks.Add(new Paragraph(new Run($"Date: {DateTime.Now.ToShortDateString()}")));
+                doc.Blocks.Add(new Paragraph(new Run($"Project: {txtFileName.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"Designer: {txtDesignerName.Text}")));
+
+                doc.Blocks.Add(new BlockUIContainer(new Separator()));
+
+                // Line Items
+                doc.Blocks.Add(new Paragraph(new Run($"Materials Cost: \t{lblMaterialsCost.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"Labor Cost: \t\t{lblLaborCost.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"Machine Cost: \t{lblMachineCost.Text}")));
+
+                doc.Blocks.Add(new BlockUIContainer(new Separator()));
+
+                // Total
+                doc.Blocks.Add(new Paragraph(new Run($"Total Landed Cost: {lblLandedCost.Text}")) { FontSize = 18, FontWeight = FontWeights.Bold, Foreground = Brushes.DarkRed });
+
+                // Margin Pricing
+                doc.Blocks.Add(new Paragraph(new Run("Suggested Retail Pricing:")) { FontWeight = FontWeights.Bold, Margin = new Thickness(0, 20, 0, 0) });
+                doc.Blocks.Add(new Paragraph(new Run($"50% Margin: \t{lblMargin50.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"60% Margin: \t{lblMargin60.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"70% Margin: \t{lblMargin70.Text}")));
+
+                // 3. Send the document to the Printer or PDF Saver!
+                IDocumentPaginatorSource idpSource = doc;
+                printDialog.PrintDocument(idpSource.DocumentPaginator, "3D Print Quote");
+            }
+        }
+
     }
 }
