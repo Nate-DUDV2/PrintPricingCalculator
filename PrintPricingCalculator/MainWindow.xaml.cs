@@ -18,9 +18,30 @@ namespace PrintPricingCalculator
             InitializeComponent();
         }
 
-        // Native Windows API to change the Title Bar color
+        // --- WINDOWS API MAGIC FOR DARK TITLE BAR ---
         [DllImport("DwmApi")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
+
+        private void SetTitleBarTheme(bool isDark)
+        {
+            try
+            {
+                // Get the secret ID of our application window
+                var hwnd = new WindowInteropHelper(this).EnsureHandle();
+                if (hwnd == IntPtr.Zero) return;
+
+                int[] themeValue = new int[] { isDark ? 1 : 0 };
+
+                // 20 is the code for Windows 11 and newer Windows 10 versions
+                DwmSetWindowAttribute(hwnd, 20, themeValue, 4);
+                // 19 is the code for older Windows 10 versions
+                DwmSetWindowAttribute(hwnd, 19, themeValue, 4);
+            }
+            catch
+            {
+                // Silently ignore if the user is on an ancient version of Windows!
+            }
+        }
 
         private void Calculate_Click(object sender, RoutedEventArgs e)
         {
@@ -94,55 +115,33 @@ namespace PrintPricingCalculator
         // --- NEW DARK MODE LOGIC ---
         private void DarkMode_Click(object sender, RoutedEventArgs e)
         {
-            // Get the unique ID of our application window
-            IntPtr windowPtr = new WindowInteropHelper(this).Handle;
+            // Update the actual Windows title bar!
+            SetTitleBarTheme(chkDarkMode.IsChecked == true);
 
             if (chkDarkMode.IsChecked == true)
             {
-                // --- 1. SET TITLE BAR TO DARK ---
-                // "20" is the secret Windows code for Immersive Dark Mode
-                int[] darkOn = new int[] { 1 };
-                DwmSetWindowAttribute(windowPtr, 20, darkOn, 4);
-
-                // --- 2. SET APP BACKGROUND TO DARK ---
-                this.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E1E1E"));
-                chkDarkMode.Foreground = Brushes.White;
-
-                // Update all TextBlocks to White
-                Style darkText = new Style(typeof(TextBlock));
-                darkText.Setters.Add(new Setter(TextBlock.ForegroundProperty, Brushes.WhiteSmoke));
-                this.Resources[typeof(TextBlock)] = darkText;
-
-                // Update all TextBoxes to Dark Grey
-                Style darkTextBox = new Style(typeof(TextBox));
-                darkTextBox.Setters.Add(new Setter(TextBox.BackgroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2D2D30"))));
-                darkTextBox.Setters.Add(new Setter(TextBox.ForegroundProperty, Brushes.White));
-                darkTextBox.Setters.Add(new Setter(TextBox.BorderBrushProperty, Brushes.Gray));
-                this.Resources[typeof(TextBox)] = darkTextBox;
+                // --- SWITCH TO DARK MODE PALETTE ---
+                this.Resources["AppBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#1E1E1E");
+                this.Resources["CardBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#252526");
+                this.Resources["PrimaryText"] = Brushes.White;
+                this.Resources["SecondaryText"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#CCCCCC");
             }
             else
             {
-                // --- 1. SET TITLE BAR TO LIGHT ---
-                int[] darkOff = new int[] { 0 };
-                DwmSetWindowAttribute(windowPtr, 20, darkOff, 4);
-
-                // --- 2. SET APP BACKGROUND TO LIGHT ---
-                this.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F4F6"));
-                chkDarkMode.Foreground = Brushes.Black;
-
-                // Remove the overrides so it goes back to standard light mode
-                this.Resources.Remove(typeof(TextBlock));
-                this.Resources.Remove(typeof(TextBox));
+                // --- SWITCH TO LIGHT MODE PALETTE ---
+                this.Resources["AppBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#F3F4F6"); // Light Gray Base
+                this.Resources["CardBackground"] = Brushes.White; // Pure White Cards
+                this.Resources["PrimaryText"] = Brushes.Black; // Black Text
+                this.Resources["SecondaryText"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#555555"); // Dark Gray Subtext
             }
 
-            // --- NEW: SAVE PREFERENCE TO WINDOWS REGISTRY ---
+            // Save preference to Windows Registry so we remember their choice!
             try
             {
-                RegistryKey appKey = Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
+                Microsoft.Win32.RegistryKey appKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
                 appKey.SetValue("IsDarkMode", chkDarkMode.IsChecked == true ? 1 : 0);
             }
             catch { }
-
         }
 
 
