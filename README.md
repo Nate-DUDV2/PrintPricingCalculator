@@ -2,7 +2,7 @@
 
 A native Windows desktop application built with C# and WPF to help 3D printing businesses and hobbyists accurately calculate the total landed cost of their 3D printed products and generate suggested retail prices.
 
-![App Screenshot](https://github.com/Nate-DUDV2/PrintPricingCalculator/blob/master//Screenshot%202026-02-21%20090635.png)
+![App Screenshot](https://github.com/Nate-DUDV2/PrintPricingCalculator/blob/master//image1.png)
 
 
 ## 🚀 Features
