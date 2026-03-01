@@ -72,10 +72,23 @@ namespace PrintPricingCalculator
                 lblMargin60.Text = (landedCost / (1.0 - 0.60)).ToString("C");
                 lblMargin70.Text = (landedCost / (1.0 - 0.70)).ToString("C");
             }
-            catch (Exception ex)
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Please ensure all inputs are valid numbers.\n\nError: " + ex.Message, "Input Error");
+            //}
+            catch
             {
-                MessageBox.Show("Please ensure all inputs are valid numbers.\n\nError: " + ex.Message, "Input Error");
+                // If the user leaves a box blank or types a letter, don't show an annoying popup!
+                // Just silently reset the totals to $0.00 until they type a valid number again.
+                lblMaterialsCost.Text = "$0.00";
+                lblLaborCost.Text = "$0.00";
+                lblMachineCost.Text = "$0.00";
+                lblLandedCost.Text = "$0.00";
+                lblMargin50.Text = "$0.00";
+                lblMargin60.Text = "$0.00";
+                lblMargin70.Text = "$0.00";
             }
+
         }
 
         // --- NEW DARK MODE LOGIC ---
@@ -121,6 +134,15 @@ namespace PrintPricingCalculator
                 this.Resources.Remove(typeof(TextBlock));
                 this.Resources.Remove(typeof(TextBox));
             }
+
+            // --- NEW: SAVE PREFERENCE TO WINDOWS REGISTRY ---
+            try
+            {
+                RegistryKey appKey = Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
+                appKey.SetValue("IsDarkMode", chkDarkMode.IsChecked == true ? 1 : 0);
+            }
+            catch { }
+
         }
 
 
@@ -273,5 +295,69 @@ namespace PrintPricingCalculator
             }
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // The window is fully loaded, let's check our theme!
+            LoadThemePreference();
+        }
+
+        private void LoadThemePreference()
+        {
+            try
+            {
+                // 1. Check if the user has manually saved a preference for OUR app before
+                RegistryKey appKey = Registry.CurrentUser.OpenSubKey(@"Software\3BCCreations\PricingCalculator");
+
+                if (appKey != null && appKey.GetValue("IsDarkMode") != null)
+                {
+                    // They have used the app before! Load their saved preference.
+                    int savedMode = (int)appKey.GetValue("IsDarkMode");
+                    chkDarkMode.IsChecked = (savedMode == 1);
+                }
+                else
+                {
+                    // 2. First time opening the app! Let's check the Windows System Theme.
+                    RegistryKey winKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+                    if (winKey != null && winKey.GetValue("AppsUseLightTheme") != null)
+                    {
+                        int systemLightMode = (int)winKey.GetValue("AppsUseLightTheme");
+                        // If Windows is set to 0, it means the system is in Dark Mode
+                        chkDarkMode.IsChecked = (systemLightMode == 0);
+                    }
+                }
+
+                // 3. Actually apply the colors by triggering our existing Dark Mode code!
+                DarkMode_Click(null, null);
+            }
+            catch
+            {
+                // If anything goes wrong (like a user on a very old Windows version), 
+                // silently ignore it and let the app stay in default Light Mode.
+            }
+        }
+
+
+        private void Input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Only try to auto-calculate if the window is fully loaded and visible.
+            // (This prevents the app from crashing while it's still drawing the text boxes on startup!)
+            if (this.IsLoaded)
+            {
+                try
+                {
+                    // Force the Calculate button to "click" itself!
+                    Calculate_Click(null, null);
+                }
+                catch
+                {
+                    // If they backspace a number and the box is temporarily empty (""), 
+                    // the math will fail. We use this catch block to silently ignore 
+                    // the error until they type a new number!
+                }
+            }
+        }
+
     }
+
+
 }

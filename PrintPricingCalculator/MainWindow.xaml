@@ -1,8 +1,9 @@
 ﻿<Window x:Class="PrintPricingCalculator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="3D Print Pricing Calculator" Height="737" Width="1103" Icon="PricingAppInstaller.ico" Background="#F3F4F6">
-    <Grid Margin="15">
+        Title="3D Print Pricing Calculator" Height="694" Width="1102" Icon="PricingAppInstaller.ico" Background="#F3F4F6"
+        Loaded="Window_Loaded">
+    <Grid Margin="15" TextBox.TextChanged="Input_TextChanged">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -88,7 +89,7 @@
                     <TextBlock Text="Postage/Shipping ($)"/>
                     <TextBox x:Name="txtPostage" Text="4.00" Margin="0,0,0,20"/>
 
-                    <Button Content="🚀 Calculate Pricing" Height="40" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Click="Calculate_Click"/>
+                    <!--<Button Content="🚀 Calculate Pricing" Height="40" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Click="Calculate_Click"/>-->
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Margin="10,0,10,0">
