@@ -2,7 +2,7 @@
 
 A native Windows desktop application and standalone Web App built to help 3D printing businesses and hobbyists accurately calculate the total landed cost of their 3D printed products and generate suggested retail prices.
 
-🌐 **Live Web Version:** [Try it now on DUDV2 Custom 3D Printing!](https://dudv2.com/pages/price-your-ptints)
+
 
 
 ![App Screenshot](https://github.com/Nate-DUDV2/PrintPricingCalculator/blob/master//image1.png)
