@@ -5,7 +5,7 @@ A native Windows desktop application and standalone Web App built to help 3D pri
 
 
 
-![App Screenshot](https://github.com/Nate-DUDV2/PrintPricingCalculator/blob/master//image1.png)
+![App Screenshot](https://github.com/Nate-DUDV2/PrintPricingCalculator/blob/master//image.png)
 
 
 ## 🚀 Features
