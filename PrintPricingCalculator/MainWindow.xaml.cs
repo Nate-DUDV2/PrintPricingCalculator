@@ -356,6 +356,16 @@ namespace PrintPricingCalculator
             }
         }
 
+        private void GitHubLogo_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // This tells Windows to open the user's default web browser
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://github.com/Nate-DUDV2/PrintPricingCalculator",
+                UseShellExecute = true
+            });
+        }
+
     }
 
 
