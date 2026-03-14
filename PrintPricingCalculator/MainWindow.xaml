@@ -19,6 +19,7 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="BorderBrush" Value="#DDDDDD"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
         </Style>
 
         <Style TargetType="Border" x:Key="CardStyle">
@@ -106,9 +107,9 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*" MaxWidth="450"/>
+                    <ColumnDefinition Width="*" MaxWidth="450"/>
+                    <ColumnDefinition Width="*" MaxWidth="450"/>
                 </Grid.ColumnDefinitions>
 
                 <Border Grid.Column="0" Style="{StaticResource CardStyle}" VerticalAlignment="Top">
@@ -153,6 +154,28 @@
                                 </TextBlock.ToolTip>
                             </TextBlock>
                             <TextBox x:Name="txtBuffer" Text="1.3"/>
+
+                            <Separator Background="#444" Margin="0,15,0,10"/>
+                            <TextBlock Text="📜 Licensing &amp; Model Costs" FontSize="15" FontWeight="Bold" Foreground="#D83B01" Margin="0,0,0,10"/>
+
+                            <TextBlock Text="License / Model Cost ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Patreon sub fee, or a one-off STL purchase."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBox x:Name="txtLicenseCost" Text="0.00"/>
+
+                            <TextBlock Text="Expected Sales ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Set to 1 for a one-off print. Set higher to spread a sub cost across multiple prints."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBox x:Name="txtExpectedSales" Text="1"/>
+
                         </StackPanel>
                     </Expander>
                 </Border>
