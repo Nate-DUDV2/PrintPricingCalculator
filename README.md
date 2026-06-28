@@ -69,8 +69,7 @@ A huge thank you to the awesome team who helped bring this application to life!
 
 * **3BC Creations** - The Spreadsheet Wiz 📊 *(Original math and calculator spreadsheet design)*
 * **Nates Print Shop** - Programmer 💻 *(C# & WPF Application Development)*
-* **Michael Print Craft with Cards** - User Experience (UX) ✨ *(Application layout, flow, and design)*
-* **3D Everything** - Beta Tester 🐛 *(Testing the math, finding bugs, and QA)*
+
 
 ## 🤝 Contributing
 
