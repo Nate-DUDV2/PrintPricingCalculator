@@ -294,8 +294,59 @@ namespace PrintPricingCalculator
             }
         }
 
+        // --- DEFAULT SETTINGS LOGIC ---
+        private void SaveDefaults_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Open the exact same registry key we used for Dark Mode
+                Microsoft.Win32.RegistryKey appKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
+
+                // Save the values the user wants to keep
+                appKey.SetValue("DefElecCost", txtElecCost.Text);
+                appKey.SetValue("DefLaborRate", txtLaborRate.Text);
+                appKey.SetValue("DefEfficiency", txtEfficiency.Text);
+                appKey.SetValue("DefPrinterCost", txtPrinterCost.Text);
+                appKey.SetValue("DefMaintenance", txtMaintenance.Text);
+                appKey.SetValue("DefPower", txtPower.Text);
+
+                MessageBox.Show("Default rates saved successfully! These will load automatically next time you open the app.", "Defaults Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not save defaults: " + ex.Message);
+            }
+        }
+
+        private void LoadDefaults()
+        {
+            try
+            {
+                // Check if our registry key exists
+                Microsoft.Win32.RegistryKey appKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\3BCCreations\PricingCalculator");
+
+                if (appKey != null)
+                {
+                    // If the values exist in the registry, plug them into the text boxes!
+                    if (appKey.GetValue("DefElecCost") != null) txtElecCost.Text = appKey.GetValue("DefElecCost").ToString();
+                    if (appKey.GetValue("DefLaborRate") != null) txtLaborRate.Text = appKey.GetValue("DefLaborRate").ToString();
+                    if (appKey.GetValue("DefEfficiency") != null) txtEfficiency.Text = appKey.GetValue("DefEfficiency").ToString();
+                    if (appKey.GetValue("DefPrinterCost") != null) txtPrinterCost.Text = appKey.GetValue("DefPrinterCost").ToString();
+                    if (appKey.GetValue("DefMaintenance") != null) txtMaintenance.Text = appKey.GetValue("DefMaintenance").ToString();
+                    if (appKey.GetValue("DefPower") != null) txtPower.Text = appKey.GetValue("DefPower").ToString();
+                }
+            }
+            catch
+            {
+                // Silently ignore if this is their first time opening the app and nothing is saved yet
+            }
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // Load the user's custom rates FIRST
+            LoadDefaults();
+
             // The window is fully loaded, let's check our theme!
             LoadThemePreference();
         }
@@ -367,6 +418,4 @@ namespace PrintPricingCalculator
         }
 
     }
-
-
 }
