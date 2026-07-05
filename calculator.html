@@ -1,0 +1,481 @@
+<div id="print-calculator-app" style="background-color: #1E1E1E; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; border-radius: 10px;">
+    
+    <style>
+        #print-calculator-app .svg-header {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        #print-calculator-app .svg-header a {
+            display: inline-block;
+            text-decoration: none;
+            transition: transform 0.2s ease-in-out;
+        }
+        #print-calculator-app .svg-header a:hover {
+            transform: scale(1.02); 
+        }
+        #print-calculator-app .svg-header svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0;
+        }
+        #print-calculator-app .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+        #print-calculator-app .card {
+            background-color: #252526;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+        }
+        #print-calculator-app .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: white;
+        }
+        #print-calculator-app details summary {
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+            list-style: none; 
+        }
+        #print-calculator-app details summary::-webkit-details-marker {
+            display: none; 
+        }
+        #print-calculator-app label {
+            display: block;
+            color: #CCCCCC;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        #print-calculator-app input[type="number"], 
+        #print-calculator-app input[type="text"] {
+            width: 100%;
+            height: 32px;
+            box-sizing: border-box;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 2px;
+            padding: 0 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        #print-calculator-app .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #AAAAAA;
+        }
+        #print-calculator-app .result-value {
+            font-weight: bold;
+            color: white;
+        }
+        #print-calculator-app .hero-box {
+            background-color: #D83B01;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0 20px 0;
+        }
+        #print-calculator-app .hero-title {
+            color: #FAD8CC;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        #print-calculator-app .hero-price {
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 5px;
+            color: white;
+        }
+        #print-calculator-app .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        #print-calculator-app button {
+            height: 32px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #print-calculator-app .btn-group button {
+            width: 85px;
+        }
+        #print-calculator-app .btn-save { background-color: #107C10; }
+        #print-calculator-app .btn-load { background-color: #0078D7; }
+        #print-calculator-app .btn-pdf { background-color: #606060; }
+        
+        #print-calculator-app .btn-default { 
+            background-color: #4A4A4A; 
+            width: 100%; 
+            margin-top: 20px;
+            padding: 8px 0;
+            height: auto;
+        }
+        #print-calculator-app .btn-default:hover {
+            background-color: #5A5A5A;
+        }
+
+        #print-calculator-app .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        #print-calculator-app .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 12px;
+            font-weight: normal;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        #print-calculator-app .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333333 transparent transparent transparent;
+        }
+        #print-calculator-app .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+
+    <div class="svg-header">
+        <a href="https://github.com/Nate-DUDV2/PrintPricingCalculator" target="_blank" title="View Source Code on GitHub">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120" width="800" height="120">
+                <rect width="800" height="120" fill="#1E1E1E" rx="10"/>
+                <g transform="translate(20, 20)" stroke="#D83B01" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round">
+                    <polygon points="40,10 66,25 66,55 40,70 14,55 14,25" />
+                    <polyline points="14,25 40,40 66,25" />
+                    <line x1="40" y1="40" x2="40" y2="70" />
+                </g>
+                <text x="100" y="45" font-family="'Segoe UI', Tahoma, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF">Precision Cost Calculator for 3D Printing</text>
+                <text x="100" y="75" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#CCCCCC">Maximizing profits with effortless accuracy.</text>
+                <text x="100" y="98" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#888888">Your ultimate 3D print quote wizard</text>
+            </svg>
+        </a>
+    </div>
+
+    <div class="grid-container">
+        
+        <div class="card">
+            <details id="advancedExpander" open>
+                <summary class="card-title">⚙️ Shop & Machine Settings ▾</summary>
+                
+                <div style="margin-top: 15px;">
+                    <label style="margin-top: 0;">Material Efficiency Factor <span class="tooltip">❓<span class="tooltiptext">Buffer for purged plastic, failed prints, and supports. (1.10 = +10%)</span></span></label>
+                    <input type="number" id="txtEfficiency" value="1.10" step="0.01" oninput="calculate()">
+
+                    <label>Labor Hourly Rate ($/hr)</label>
+                    <input type="number" id="txtLaborRate" value="20.0" oninput="calculate()">
+
+                    <label>Printer Cost ($)</label>
+                    <input type="number" id="txtPrinterCost" value="1000" oninput="calculate()">
+
+                    <label>Est. Annual Maintenance ($)</label>
+                    <input type="number" id="txtMaintenance" value="75" oninput="calculate()">
+
+                    <label>Estimated Life (yrs)</label>
+                    <input type="number" id="txtLife" value="3" oninput="calculate()">
+
+                    <label>Estimated Uptime (%)</label>
+                    <input type="number" id="txtUptime" value="50" oninput="calculate()">
+
+                    <label>Printer Power (W)</label>
+                    <input type="number" id="txtPower" value="150" oninput="calculate()">
+
+                    <label>Electricity Cost ($/KWh)</label>
+                    <input type="number" id="txtElecCost" value="0.14" step="0.01" oninput="calculate()">
+
+                    <label>Printer Cost Buffer Factor <span class="tooltip">❓<span class="tooltiptext">Buffer for hidden maintenance. (1.30 = +30%)</span></span></label>
+                    <input type="number" id="txtBuffer" value="1.3" step="0.1" oninput="calculate()">
+
+                    <div style="border-top: 1px solid #444; margin-top: 25px; padding-top: 15px;">
+                        <div class="card-title" style="font-size: 15px; color: #D83B01; margin-bottom: 5px;">📜 Licensing & Model Costs</div>
+                        
+                        <label>License / Model Cost ($) <span class="tooltip">❓<span class="tooltiptext">Patreon sub fee, or a one-off STL purchase.</span></span></label>
+                        <input type="number" id="txtLicenseCost" value="0.00" oninput="calculate()">
+
+                        <label>Expected Sales <span class="tooltip">❓<span class="tooltiptext">Set to 1 for a one-off print. Set higher to spread a sub cost across multiple prints.</span></span></label>
+                        <input type="number" id="txtExpectedSales" value="1" oninput="calculate()">
+                    </div>
+
+                    <button type="button" class="btn-default" onclick="saveDefaults()" title="Save these settings to load automatically next time you open the app">💾 Save Settings as Default</button>
+                </div>
+            </details>
+        </div>
+
+        <div>
+            <div class="card">
+                <div class="card-title">🖨️ Core Print Details</div>
+                
+                <label style="margin-top: 0;">Filament Cost ($/kg)</label>
+                <input type="number" id="txtFilamentCost" value="20.0" oninput="calculate()">
+
+                <label>Total Filament Required (g)</label>
+                <input type="number" id="txtFilamentReq" value="150" oninput="calculate()">
+
+                <label>Total Printing Time (hr)</label>
+                <input type="number" id="txtPrintTime" value="5.0" oninput="calculate()">
+
+                <label>Total Labor Required (min)</label>
+                <input type="number" id="txtLaborTime" value="15" oninput="calculate()">
+
+                <label>Total Extra Hardware Cost ($)</label>
+                <input type="number" id="txtHardwareCost" value="0.00" oninput="calculate()">
+
+                <label>Total Packaging Cost ($)</label>
+                <input type="number" id="txtPackagingCost" value="1.50" oninput="calculate()">
+                
+                <label>Postage/Shipping ($)</label>
+                <input type="number" id="txtPostage" value="4.00" oninput="calculate()">
+            </div>
+        </div>
+
+        <div>
+            <div class="card">
+                <div class="card-title">📊 Final Pricing</div>
+                
+                <div class="result-row">
+                    <span>Materials:</span>
+                    <span class="result-value" id="lblMaterialsCost">$0.00</span>
+                </div>
+                <div class="result-row">
+                    <span>Labor:</span>
+                    <span class="result-value" id="lblLaborCost">$0.00</span>
+                </div>
+                <div class="result-row" style="margin-bottom: 15px;">
+                    <span>Machine Wear:</span>
+                    <span class="result-value" id="lblMachineCost">$0.00</span>
+                </div>
+
+                <div class="hero-box">
+                    <div class="hero-title">Total Landed Cost:</div>
+                    <div class="hero-price" id="lblLandedCost">$0.00</div>
+                </div>
+
+                <div style="color: white; font-weight: 600; margin-bottom: 10px;">Suggested Retail Pricing:</div>
+                <div class="result-row" style="color: #888888; margin-bottom: 5px;">
+                    <span>50% Margin:</span>
+                    <span class="result-value" id="lblMargin50" style="color: #CCCCCC;">$0.00</span>
+                </div>
+                <div class="result-row" style="color: #888888; margin-bottom: 5px;">
+                    <span>60% Margin:</span>
+                    <span class="result-value" id="lblMargin60" style="color: #CCCCCC;">$0.00</span>
+                </div>
+                <div class="result-row" style="color: #888888;">
+                    <span>70% Margin:</span>
+                    <span class="result-value" id="lblMargin70" style="color: #CCCCCC;">$0.00</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📁 Project File</div>
+                
+                <label style="margin-top: 0;">File / Part Name</label>
+                <input type="text" id="txtFileName" value="IceCream Print">
+
+                <label>Designer Name</label>
+                <input type="text" id="txtDesignerName" value="Nates Print Shops">
+
+                <div class="btn-group">
+                    <button type="button" class="btn-save" onclick="saveQuote()">💾 Save</button>
+                    <button type="button" class="btn-load" onclick="triggerLoad()">📂 Load</button>
+                    <button type="button" class="btn-pdf" onclick="window.print()">🖨️ PDF</button>
+                </div>
+                
+                <input type="file" id="fileLoader" style="display:none;" accept=".3dquote,.json" onchange="loadQuote(event)">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function calculate() {
+            try {
+                let efficiency = parseFloat(document.getElementById('txtEfficiency').value) || 1.0;
+                let laborRate = parseFloat(document.getElementById('txtLaborRate').value) || 0;
+                let printerCost = parseFloat(document.getElementById('txtPrinterCost').value) || 0;
+                let annualMaint = parseFloat(document.getElementById('txtMaintenance').value) || 0;
+                let yearsLife = parseFloat(document.getElementById('txtLife').value) || 1;
+                let uptimePercent = parseFloat(document.getElementById('txtUptime').value) || 100;
+                let printerPowerW = parseFloat(document.getElementById('txtPower').value) || 0;
+                let elecCostKWh = parseFloat(document.getElementById('txtElecCost').value) || 0;
+                let machineBuffer = parseFloat(document.getElementById('txtBuffer').value) || 1.0;
+
+                let filCostPerKg = parseFloat(document.getElementById('txtFilamentCost').value) || 0;
+                let filGrams = parseFloat(document.getElementById('txtFilamentReq').value) || 0;
+                let printTimeHr = parseFloat(document.getElementById('txtPrintTime').value) || 0;
+                let laborMins = parseFloat(document.getElementById('txtLaborTime').value) || 0;
+                let hardwareCost = parseFloat(document.getElementById('txtHardwareCost').value) || 0;
+                let packagingCost = parseFloat(document.getElementById('txtPackagingCost').value) || 0;
+                let postageCost = parseFloat(document.getElementById('txtPostage').value) || 0;
+
+                // Streamlined License Math
+                let licenseCost = parseFloat(document.getElementById('txtLicenseCost').value) || 0;
+                let expectedSales = parseFloat(document.getElementById('txtExpectedSales').value) || 1;
+                // Prevent division by zero if user clears the box
+                if (expectedSales <= 0) expectedSales = 1; 
+                let appliedLicenseCost = licenseCost / expectedSales;
+
+                let matCost = (filCostPerKg / 1000) * filGrams * efficiency;
+                let labCost = (laborRate / 60) * laborMins;
+                
+                let totalHoursActivePerYear = 365 * 24 * (uptimePercent / 100);
+                let depreciationPerHour = printerCost / (yearsLife * totalHoursActivePerYear);
+                let maintenancePerHour = annualMaint / totalHoursActivePerYear;
+                let electricityPerHour = (printerPowerW / 1000) * elecCostKWh;
+                
+                let baseMachineCostPerHour = depreciationPerHour + maintenancePerHour + electricityPerHour;
+                let machCost = (baseMachineCostPerHour * machineBuffer) * printTimeHr;
+                
+                // FINAL SUM
+                let totalCost = matCost + labCost + machCost + hardwareCost + packagingCost + postageCost + appliedLicenseCost;
+
+                const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+                
+                document.getElementById('lblMaterialsCost').innerText = formatter.format(matCost);
+                document.getElementById('lblLaborCost').innerText = formatter.format(labCost);
+                document.getElementById('lblMachineCost').innerText = formatter.format(machCost);
+                document.getElementById('lblLandedCost').innerText = formatter.format(totalCost);
+                
+                document.getElementById('lblMargin50').innerText = formatter.format(totalCost / 0.50);
+                document.getElementById('lblMargin60').innerText = formatter.format(totalCost / 0.40);
+                document.getElementById('lblMargin70').innerText = formatter.format(totalCost / 0.30);
+            } catch (e) { }
+        }
+
+        // --- NEW DEFAULTS LOGIC ---
+        function saveDefaults() {
+            let defaultsData = {
+                txtEfficiency: document.getElementById('txtEfficiency').value,
+                txtLaborRate: document.getElementById('txtLaborRate').value,
+                txtPrinterCost: document.getElementById('txtPrinterCost').value,
+                txtMaintenance: document.getElementById('txtMaintenance').value,
+                txtLife: document.getElementById('txtLife').value,
+                txtUptime: document.getElementById('txtUptime').value,
+                txtPower: document.getElementById('txtPower').value,
+                txtElecCost: document.getElementById('txtElecCost').value,
+                txtBuffer: document.getElementById('txtBuffer').value,
+                txtLicenseCost: document.getElementById('txtLicenseCost').value,
+                txtExpectedSales: document.getElementById('txtExpectedSales').value
+            };
+
+            // Save to browser's local storage
+            localStorage.setItem('printCalcDefaults', JSON.stringify(defaultsData));
+            alert("Default rates saved successfully! These will load automatically next time you open the app.");
+        }
+
+        function loadDefaults() {
+            let savedDefaults = localStorage.getItem('printCalcDefaults');
+            if (savedDefaults) {
+                try {
+                    let defaultsData = JSON.parse(savedDefaults);
+                    for (const key in defaultsData) {
+                        if (document.getElementById(key)) {
+                            document.getElementById(key).value = defaultsData[key];
+                        }
+                    }
+                } catch (err) {
+                    console.error("Could not load default settings", err);
+                }
+            }
+        }
+        // ---------------------------
+
+        function saveQuote() {
+            let quoteData = {
+                txtEfficiency: document.getElementById('txtEfficiency').value,
+                txtLaborRate: document.getElementById('txtLaborRate').value,
+                txtPrinterCost: document.getElementById('txtPrinterCost').value,
+                txtMaintenance: document.getElementById('txtMaintenance').value,
+                txtLife: document.getElementById('txtLife').value,
+                txtUptime: document.getElementById('txtUptime').value,
+                txtPower: document.getElementById('txtPower').value,
+                txtElecCost: document.getElementById('txtElecCost').value,
+                txtBuffer: document.getElementById('txtBuffer').value,
+                txtLicenseCost: document.getElementById('txtLicenseCost').value,
+                txtExpectedSales: document.getElementById('txtExpectedSales').value,
+                txtFilamentCost: document.getElementById('txtFilamentCost').value,
+                txtFilamentReq: document.getElementById('txtFilamentReq').value,
+                txtPrintTime: document.getElementById('txtPrintTime').value,
+                txtLaborTime: document.getElementById('txtLaborTime').value,
+                txtHardwareCost: document.getElementById('txtHardwareCost').value,
+                txtPackagingCost: document.getElementById('txtPackagingCost').value,
+                txtPostage: document.getElementById('txtPostage').value,
+                txtFileName: document.getElementById('txtFileName').value,
+                txtDesignerName: document.getElementById('txtDesignerName').value
+            };
+
+            let dataStr = JSON.stringify(quoteData, null, 2);
+            let blob = new Blob([dataStr], { type: "application/json" });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = (document.getElementById('txtFileName').value.trim() || "3D_Quote") + ".3dquote";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function triggerLoad() {
+            document.getElementById('fileLoader').click();
+        }
+
+        function loadQuote(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let quoteData = JSON.parse(e.target.result);
+                    for (const key in quoteData) {
+                        if (document.getElementById(key)) {
+                            document.getElementById(key).value = quoteData[key];
+                        }
+                    }
+                    calculate();
+                } catch (err) {
+                    alert("Error loading file!");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = "";
+        }
+
+        // Check for defaults before doing the very first calculation!
+        loadDefaults();
+        calculate();
+    </script>
+</div>
