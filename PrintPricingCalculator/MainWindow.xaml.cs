@@ -67,6 +67,12 @@ namespace PrintPricingCalculator
                 double packagingCost = double.Parse(txtPackagingCost.Text);
                 double postage = double.Parse(txtPostage.Text);
 
+                // Read License/Expected Sales inputs
+                double licenseCost = double.Parse(txtLicenseCost.Text);
+                double expectedSales = double.Parse(txtExpectedSales.Text);
+                if (expectedSales <= 0) expectedSales = 1;
+                double appliedLicenseCost = licenseCost / expectedSales;
+
                 // 3. Machine Cost Calculations 
                 double lifetimeCost = printerCost + (maintenance * lifeYears);
                 double uptimeHrsYr = uptimePct * 8760.0;
@@ -81,7 +87,7 @@ namespace PrintPricingCalculator
                 double machineCostTotal = printTime * printTimeRate;
                 double totalPackaging = packagingCost + postage;
 
-                double landedCost = totalMaterials + totalLabor + totalPackaging + machineCostTotal;
+                double landedCost = totalMaterials + totalLabor + totalPackaging + machineCostTotal + appliedLicenseCost;
 
                 // 5. Update UI Labels
                 lblMaterialsCost.Text = totalMaterials.ToString("C");
@@ -89,14 +95,11 @@ namespace PrintPricingCalculator
                 lblMachineCost.Text = machineCostTotal.ToString("C");
                 lblLandedCost.Text = landedCost.ToString("C");
 
+                lblMargin40.Text = (landedCost / (1.0 - 0.40)).ToString("C");
                 lblMargin50.Text = (landedCost / (1.0 - 0.50)).ToString("C");
                 lblMargin60.Text = (landedCost / (1.0 - 0.60)).ToString("C");
                 lblMargin70.Text = (landedCost / (1.0 - 0.70)).ToString("C");
             }
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Please ensure all inputs are valid numbers.\n\nError: " + ex.Message, "Input Error");
-            //}
             catch
             {
                 // If the user leaves a box blank or types a letter, don't show an annoying popup!
@@ -105,11 +108,11 @@ namespace PrintPricingCalculator
                 lblLaborCost.Text = "$0.00";
                 lblMachineCost.Text = "$0.00";
                 lblLandedCost.Text = "$0.00";
+                lblMargin40.Text = "$0.00";
                 lblMargin50.Text = "$0.00";
                 lblMargin60.Text = "$0.00";
                 lblMargin70.Text = "$0.00";
             }
-
         }
 
         // --- NEW DARK MODE LOGIC ---
@@ -144,7 +147,6 @@ namespace PrintPricingCalculator
             catch { }
         }
 
-
         // This class holds all the data we want to save to the file
         public class QuoteData
         {
@@ -159,6 +161,8 @@ namespace PrintPricingCalculator
             public string Power { get; set; }
             public string ElecCost { get; set; }
             public string Buffer { get; set; }
+            public string LicenseCost { get; set; }
+            public string ExpectedSales { get; set; }
             public string FilamentCost { get; set; }
             public string FilamentReq { get; set; }
             public string PrintTime { get; set; }
@@ -167,6 +171,7 @@ namespace PrintPricingCalculator
             public string PackagingCost { get; set; }
             public string Postage { get; set; }
         }
+
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             // 1. Gather all current text box values into our data object
@@ -183,6 +188,8 @@ namespace PrintPricingCalculator
                 Power = txtPower.Text,
                 ElecCost = txtElecCost.Text,
                 Buffer = txtBuffer.Text,
+                LicenseCost = txtLicenseCost.Text,
+                ExpectedSales = txtExpectedSales.Text,
                 FilamentCost = txtFilamentCost.Text,
                 FilamentReq = txtFilamentReq.Text,
                 PrintTime = txtPrintTime.Text,
@@ -234,6 +241,8 @@ namespace PrintPricingCalculator
                     txtPower.Text = data.Power;
                     txtElecCost.Text = data.ElecCost;
                     txtBuffer.Text = data.Buffer;
+                    txtLicenseCost.Text = data.LicenseCost ?? "0.00";
+                    txtExpectedSales.Text = data.ExpectedSales ?? "1";
                     txtFilamentCost.Text = data.FilamentCost;
                     txtFilamentReq.Text = data.FilamentReq;
                     txtPrintTime.Text = data.PrintTime;
@@ -251,7 +260,6 @@ namespace PrintPricingCalculator
                 }
             }
         }
-
 
         private void Print_Click(object sender, RoutedEventArgs e)
         {
@@ -284,6 +292,7 @@ namespace PrintPricingCalculator
 
                 // Margin Pricing
                 doc.Blocks.Add(new Paragraph(new Run("Suggested Retail Pricing:")) { FontWeight = FontWeights.Bold, Margin = new Thickness(0, 20, 0, 0) });
+                doc.Blocks.Add(new Paragraph(new Run($"40% Margin: \t{lblMargin40.Text}")));
                 doc.Blocks.Add(new Paragraph(new Run($"50% Margin: \t{lblMargin50.Text}")));
                 doc.Blocks.Add(new Paragraph(new Run($"60% Margin: \t{lblMargin60.Text}")));
                 doc.Blocks.Add(new Paragraph(new Run($"70% Margin: \t{lblMargin70.Text}")));
@@ -309,6 +318,8 @@ namespace PrintPricingCalculator
                 appKey.SetValue("DefPrinterCost", txtPrinterCost.Text);
                 appKey.SetValue("DefMaintenance", txtMaintenance.Text);
                 appKey.SetValue("DefPower", txtPower.Text);
+                appKey.SetValue("DefLicenseCost", txtLicenseCost.Text);
+                appKey.SetValue("DefExpectedSales", txtExpectedSales.Text);
 
                 MessageBox.Show("Default rates saved successfully! These will load automatically next time you open the app.", "Defaults Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -334,6 +345,8 @@ namespace PrintPricingCalculator
                     if (appKey.GetValue("DefPrinterCost") != null) txtPrinterCost.Text = appKey.GetValue("DefPrinterCost").ToString();
                     if (appKey.GetValue("DefMaintenance") != null) txtMaintenance.Text = appKey.GetValue("DefMaintenance").ToString();
                     if (appKey.GetValue("DefPower") != null) txtPower.Text = appKey.GetValue("DefPower").ToString();
+                    if (appKey.GetValue("DefLicenseCost") != null) txtLicenseCost.Text = appKey.GetValue("DefLicenseCost").ToString();
+                    if (appKey.GetValue("DefExpectedSales") != null) txtExpectedSales.Text = appKey.GetValue("DefExpectedSales").ToString();
                 }
             }
             catch
@@ -386,7 +399,6 @@ namespace PrintPricingCalculator
             }
         }
 
-
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
         {
             // Only try to auto-calculate if the window is fully loaded and visible.
@@ -416,6 +428,5 @@ namespace PrintPricingCalculator
                 UseShellExecute = true
             });
         }
-
     }
 }

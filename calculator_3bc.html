@@ -171,7 +171,7 @@
     </style>
 
     <div class="svg-header">
-        <a href="https://github.com/Nate-DUDV2/PrintPricingCalculator" target="_blank" title="View Source Code on GitHub">
+        <a href="https://www.3bccreations.com/" target="_blank" title="Home">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120" width="800" height="120">
                 <rect width="800" height="120" fill="#1E1E1E" rx="10"/>
                 <g transform="translate(20, 20)" stroke="#D83B01" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round">
@@ -286,10 +286,6 @@
 
                 <div style="color: white; font-weight: 600; margin-bottom: 10px;">Suggested Retail Pricing:</div>
                 <div class="result-row" style="color: #888888; margin-bottom: 5px;">
-                    <span>40% Margin:</span>
-                    <span class="result-value" id="lblMargin40" style="color: #CCCCCC;">$0.00</span>
-                </div>
-                <div class="result-row" style="color: #888888; margin-bottom: 5px;">
                     <span>50% Margin:</span>
                     <span class="result-value" id="lblMargin50" style="color: #CCCCCC;">$0.00</span>
                 </div>
@@ -373,7 +369,6 @@
                 document.getElementById('lblMachineCost').innerText = formatter.format(machCost);
                 document.getElementById('lblLandedCost').innerText = formatter.format(totalCost);
                 
-                document.getElementById('lblMargin40').innerText = formatter.format(totalCost / 0.60);
                 document.getElementById('lblMargin50').innerText = formatter.format(totalCost / 0.50);
                 document.getElementById('lblMargin60').innerText = formatter.format(totalCost / 0.40);
                 document.getElementById('lblMargin70').innerText = formatter.format(totalCost / 0.30);

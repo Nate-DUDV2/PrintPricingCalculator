@@ -177,9 +177,9 @@
                             <TextBox x:Name="txtExpectedSales" Text="1"/>
 
                             <Button Content="💾 Save Settings as Default" Height="32" Padding="20,0,20,0" Margin="0,20,0,10" 
-        HorizontalAlignment="Center" Background="#4A4A4A" Foreground="White" 
-        FontWeight="Bold" BorderThickness="0" Click="SaveDefaults_Click" Cursor="Hand"
-        ToolTip="Save these settings to load automatically next time you open the app"/>
+                                    HorizontalAlignment="Center" Background="#4A4A4A" Foreground="White" 
+                                    FontWeight="Bold" BorderThickness="0" Click="SaveDefaults_Click" Cursor="Hand"
+                                    ToolTip="Save these settings to load automatically next time you open the app"/>
 
                         </StackPanel>
                     </Expander>
@@ -241,6 +241,11 @@
                             </Border>
 
                             <TextBlock Text="Suggested Retail Pricing:" Foreground="{DynamicResource PrimaryText}" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                            <Grid Margin="0,0,0,5">
+                                <TextBlock Text="40% Margin:" Foreground="{DynamicResource SecondaryText}" HorizontalAlignment="Left"/>
+                                <TextBlock x:Name="lblMargin40" Text="$0.00" FontWeight="Bold" Foreground="{DynamicResource PrimaryText}" HorizontalAlignment="Right"/>
+                            </Grid>
                             <Grid Margin="0,0,0,5">
                                 <TextBlock Text="50% Margin:" Foreground="{DynamicResource SecondaryText}" HorizontalAlignment="Left"/>
                                 <TextBlock x:Name="lblMargin50" Text="$0.00" FontWeight="Bold" Foreground="{DynamicResource PrimaryText}" HorizontalAlignment="Right"/>

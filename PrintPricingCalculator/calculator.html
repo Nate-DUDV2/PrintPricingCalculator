@@ -286,10 +286,6 @@
 
                 <div style="color: white; font-weight: 600; margin-bottom: 10px;">Suggested Retail Pricing:</div>
                 <div class="result-row" style="color: #888888; margin-bottom: 5px;">
-                    <span>40% Margin:</span>
-                    <span class="result-value" id="lblMargin40" style="color: #CCCCCC;">$0.00</span>
-                </div>
-                <div class="result-row" style="color: #888888; margin-bottom: 5px;">
                     <span>50% Margin:</span>
                     <span class="result-value" id="lblMargin50" style="color: #CCCCCC;">$0.00</span>
                 </div>
@@ -373,7 +369,6 @@
                 document.getElementById('lblMachineCost').innerText = formatter.format(machCost);
                 document.getElementById('lblLandedCost').innerText = formatter.format(totalCost);
                 
-                document.getElementById('lblMargin40').innerText = formatter.format(totalCost / 0.60);
                 document.getElementById('lblMargin50').innerText = formatter.format(totalCost / 0.50);
                 document.getElementById('lblMargin60').innerText = formatter.format(totalCost / 0.40);
                 document.getElementById('lblMargin70').innerText = formatter.format(totalCost / 0.30);
