@@ -92,8 +92,8 @@
                     <TextBlock Text="Maximizing profits with effortless accuracy." 
                        FontSize="14" Foreground="{DynamicResource PrimaryText}" Opacity="0.8" FontFamily="Segoe UI" Margin="0,2,0,0"/>
 
-                    <TextBlock Text="Your ultimate 3D print quote wizard" 
-                       FontSize="12" Foreground="{DynamicResource PrimaryText}" Opacity="0.5" FontFamily="Segoe UI" Margin="0,2,0,0"/>
+                    <TextBlock x:Name="lblSubtitle" Text="Your ultimate 3D print quote wizard" 
+           FontSize="12" Foreground="{DynamicResource PrimaryText}" Opacity="0.5" FontFamily="Segoe UI" Margin="0,2,0,0"/>
                 </StackPanel>
             </StackPanel>
 

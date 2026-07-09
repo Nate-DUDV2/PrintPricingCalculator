@@ -7,6 +7,7 @@ using System.Windows.Interop;
 using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
+using System.Reflection;
 using System.Windows.Documents;
 
 namespace PrintPricingCalculator
@@ -280,22 +281,22 @@ namespace PrintPricingCalculator
 
                 doc.Blocks.Add(new BlockUIContainer(new Separator()));
 
-                // Line Items
-                doc.Blocks.Add(new Paragraph(new Run($"Materials Cost: \t{lblMaterialsCost.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"Labor Cost: \t\t{lblLaborCost.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"Machine Cost: \t{lblMachineCost.Text}")));
+                // Line Items 
+                doc.Blocks.Add(new Paragraph(new Run($"Materials Cost:\t{lblMaterialsCost.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"Labor Cost:\t{lblLaborCost.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"Machine Cost:\t{lblMachineCost.Text}")));
 
                 doc.Blocks.Add(new BlockUIContainer(new Separator()));
 
                 // Total
                 doc.Blocks.Add(new Paragraph(new Run($"Total Landed Cost: {lblLandedCost.Text}")) { FontSize = 18, FontWeight = FontWeights.Bold, Foreground = Brushes.DarkRed });
 
-                // Margin Pricing
+                // Margin Pricing 
                 doc.Blocks.Add(new Paragraph(new Run("Suggested Retail Pricing:")) { FontWeight = FontWeights.Bold, Margin = new Thickness(0, 20, 0, 0) });
-                doc.Blocks.Add(new Paragraph(new Run($"40% Margin: \t{lblMargin40.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"50% Margin: \t{lblMargin50.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"60% Margin: \t{lblMargin60.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"70% Margin: \t{lblMargin70.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"40% Margin:\t{lblMargin40.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"50% Margin:\t{lblMargin50.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"60% Margin:\t{lblMargin60.Text}")));
+                doc.Blocks.Add(new Paragraph(new Run($"70% Margin:\t{lblMargin70.Text}")));
 
                 // 3. Send the document to the Printer or PDF Saver!
                 IDocumentPaginatorSource idpSource = doc;
@@ -320,6 +321,7 @@ namespace PrintPricingCalculator
                 appKey.SetValue("DefPower", txtPower.Text);
                 appKey.SetValue("DefLicenseCost", txtLicenseCost.Text);
                 appKey.SetValue("DefExpectedSales", txtExpectedSales.Text);
+                appKey.SetValue("DefDesignerName", txtDesignerName.Text);
 
                 MessageBox.Show("Default rates saved successfully! These will load automatically next time you open the app.", "Defaults Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -347,6 +349,7 @@ namespace PrintPricingCalculator
                     if (appKey.GetValue("DefPower") != null) txtPower.Text = appKey.GetValue("DefPower").ToString();
                     if (appKey.GetValue("DefLicenseCost") != null) txtLicenseCost.Text = appKey.GetValue("DefLicenseCost").ToString();
                     if (appKey.GetValue("DefExpectedSales") != null) txtExpectedSales.Text = appKey.GetValue("DefExpectedSales").ToString();
+                    if (appKey.GetValue("DefDesignerName") != null) txtDesignerName.Text = appKey.GetValue("DefDesignerName").ToString();
                 }
             }
             catch
@@ -357,6 +360,9 @@ namespace PrintPricingCalculator
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
+            Version ver = Assembly.GetExecutingAssembly().GetName().Version;
+            lblSubtitle.Text = $"Your ultimate 3D print quote wizard | v{ver.Major}.{ver.Minor}.{ver.Build}";
             // Load the user's custom rates FIRST
             LoadDefaults();
 
