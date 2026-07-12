@@ -2,13 +2,14 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
-using System.Reflection;
 using System.Windows.Documents;
+using System.Reflection;
 
 namespace PrintPricingCalculator
 {
@@ -19,7 +20,6 @@ namespace PrintPricingCalculator
             InitializeComponent();
         }
 
-        // --- WINDOWS API MAGIC FOR DARK TITLE BAR ---
         [DllImport("DwmApi")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
 
@@ -27,28 +27,23 @@ namespace PrintPricingCalculator
         {
             try
             {
-                // Get the secret ID of our application window
-                var hwnd = new WindowInteropHelper(this).EnsureHandle();
-                if (hwnd == IntPtr.Zero) return;
+                IntPtr hwnd = new WindowInteropHelper(this).EnsureHandle();
+                if (hwnd == IntPtr.Zero)
+                {
+                    return;
+                }
 
                 int[] themeValue = new int[] { isDark ? 1 : 0 };
-
-                // 20 is the code for Windows 11 and newer Windows 10 versions
                 DwmSetWindowAttribute(hwnd, 20, themeValue, 4);
-                // 19 is the code for older Windows 10 versions
                 DwmSetWindowAttribute(hwnd, 19, themeValue, 4);
             }
-            catch
-            {
-                // Silently ignore if the user is on an ancient version of Windows!
-            }
+            catch { }
         }
 
         private void Calculate_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 1. Read Advanced Inputs
                 double efficiency = double.Parse(txtEfficiency.Text);
                 double laborRate = double.Parse(txtLaborRate.Text);
                 double printerCost = double.Parse(txtPrinterCost.Text);
@@ -59,7 +54,6 @@ namespace PrintPricingCalculator
                 double elecCost = double.Parse(txtElecCost.Text);
                 double buffer = double.Parse(txtBuffer.Text);
 
-                // 2. Read Core Inputs
                 double filCost = double.Parse(txtFilamentCost.Text);
                 double filReq = double.Parse(txtFilamentReq.Text);
                 double printTime = double.Parse(txtPrintTime.Text);
@@ -67,92 +61,127 @@ namespace PrintPricingCalculator
                 double hardwareCost = double.Parse(txtHardwareCost.Text);
                 double packagingCost = double.Parse(txtPackagingCost.Text);
                 double postage = double.Parse(txtPostage.Text);
+                double taxPct = double.Parse(txtTaxRate.Text) / 100.0;
+                double discountPct = double.Parse(txtDiscount.Text) / 100.0;
 
-                // Read License/Expected Sales inputs
                 double licenseCost = double.Parse(txtLicenseCost.Text);
                 double expectedSales = double.Parse(txtExpectedSales.Text);
-                if (expectedSales <= 0) expectedSales = 1;
+                if (expectedSales <= 0)
+                {
+                    expectedSales = 1;
+                }
+
                 double appliedLicenseCost = licenseCost / expectedSales;
 
-                // 3. Machine Cost Calculations 
                 double lifetimeCost = printerCost + (maintenance * lifeYears);
                 double uptimeHrsYr = uptimePct * 8760.0;
                 double capitalCostPerHr = (uptimeHrsYr * lifeYears) > 0 ? lifetimeCost / (uptimeHrsYr * lifeYears) : 0;
                 double elecCostPerHr = (powerW / 1000.0) * elecCost;
                 double printTimeRate = (capitalCostPerHr + elecCostPerHr) * buffer;
 
-                // 4. Final Cost Calculations
                 double printedPartCost = (filReq / 1000.0) * filCost * efficiency;
                 double totalMaterials = printedPartCost + hardwareCost;
                 double totalLabor = (laborTimeMins / 60.0) * laborRate;
                 double machineCostTotal = printTime * printTimeRate;
                 double totalPackaging = packagingCost + postage;
 
-                double landedCost = totalMaterials + totalLabor + totalPackaging + machineCostTotal + appliedLicenseCost;
+                double preTaxCost = totalMaterials + totalLabor + totalPackaging + machineCostTotal + appliedLicenseCost;
+                double taxAmount = preTaxCost * taxPct;
+                double landedCost = preTaxCost + taxAmount;
 
-                // 5. Update UI Labels
                 lblMaterialsCost.Text = totalMaterials.ToString("C");
                 lblLaborCost.Text = totalLabor.ToString("C");
                 lblMachineCost.Text = machineCostTotal.ToString("C");
+                lblTaxCost.Text = taxAmount.ToString("C");
                 lblLandedCost.Text = landedCost.ToString("C");
 
-                lblMargin40.Text = (landedCost / (1.0 - 0.40)).ToString("C");
-                lblMargin50.Text = (landedCost / (1.0 - 0.50)).ToString("C");
-                lblMargin60.Text = (landedCost / (1.0 - 0.60)).ToString("C");
-                lblMargin70.Text = (landedCost / (1.0 - 0.70)).ToString("C");
+                double price40 = landedCost / (1.0 - 0.40);
+                double price50 = landedCost / (1.0 - 0.50);
+                double price60 = landedCost / (1.0 - 0.60);
+                double price70 = landedCost / (1.0 - 0.70);
+
+                lblMargin40.Text = price40.ToString("C");
+                lblMargin50.Text = price50.ToString("C");
+                lblMargin60.Text = price60.ToString("C");
+                lblMargin70.Text = price70.ToString("C");
+
+                double selectedBasePrice = 0;
+                if (rbMargin40.IsChecked == true)
+                {
+                    selectedBasePrice = price40;
+                }
+                else if (rbMargin50.IsChecked == true)
+                {
+                    selectedBasePrice = price50;
+                }
+                else if (rbMargin60.IsChecked == true)
+                {
+                    selectedBasePrice = price60;
+                }
+                else if (rbMargin70.IsChecked == true)
+                {
+                    selectedBasePrice = price70;
+                }
+
+                double finalCustomerPrice = selectedBasePrice * (1.0 - discountPct);
+                lblFinalQuotePrice.Text = finalCustomerPrice.ToString("C");
             }
             catch
             {
-                // If the user leaves a box blank or types a letter, don't show an annoying popup!
-                // Just silently reset the totals to $0.00 until they type a valid number again.
                 lblMaterialsCost.Text = "$0.00";
                 lblLaborCost.Text = "$0.00";
                 lblMachineCost.Text = "$0.00";
+                lblTaxCost.Text = "$0.00";
                 lblLandedCost.Text = "$0.00";
                 lblMargin40.Text = "$0.00";
                 lblMargin50.Text = "$0.00";
                 lblMargin60.Text = "$0.00";
                 lblMargin70.Text = "$0.00";
+                lblFinalQuotePrice.Text = "$0.00";
             }
         }
 
-        // --- NEW DARK MODE LOGIC ---
         private void DarkMode_Click(object sender, RoutedEventArgs e)
         {
-            // Update the actual Windows title bar!
             SetTitleBarTheme(chkDarkMode.IsChecked == true);
-
             if (chkDarkMode.IsChecked == true)
             {
-                // --- SWITCH TO DARK MODE PALETTE ---
-                this.Resources["AppBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#1E1E1E");
-                this.Resources["CardBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#252526");
-                this.Resources["PrimaryText"] = Brushes.White;
-                this.Resources["SecondaryText"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#CCCCCC");
+                Resources["AppBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#1E1E1E");
+                Resources["CardBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#252526");
+                Resources["PrimaryText"] = Brushes.White;
+                Resources["SecondaryText"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#CCCCCC");
             }
             else
             {
-                // --- SWITCH TO LIGHT MODE PALETTE ---
-                this.Resources["AppBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#F3F4F6"); // Light Gray Base
-                this.Resources["CardBackground"] = Brushes.White; // Pure White Cards
-                this.Resources["PrimaryText"] = Brushes.Black; // Black Text
-                this.Resources["SecondaryText"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#555555"); // Dark Gray Subtext
+                Resources["AppBackground"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#F3F4F6");
+                Resources["CardBackground"] = Brushes.White;
+                Resources["PrimaryText"] = Brushes.Black;
+                Resources["SecondaryText"] = (SolidColorBrush)new BrushConverter().ConvertFrom("#555555");
             }
-
-            // Save preference to Windows Registry so we remember their choice!
             try
             {
-                Microsoft.Win32.RegistryKey appKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
+                RegistryKey appKey = Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
                 appKey.SetValue("IsDarkMode", chkDarkMode.IsChecked == true ? 1 : 0);
             }
             catch { }
         }
 
-        // This class holds all the data we want to save to the file
+        private void BrowseLogo_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg";
+            if (dlg.ShowDialog() == true)
+            {
+                txtLogoPath.Text = dlg.FileName;
+            }
+        }
+
         public class QuoteData
         {
             public string FileName { get; set; }
             public string DesignerName { get; set; }
+            public string QuoteNumber { get; set; }
+            public string CustomerName { get; set; }
             public string Efficiency { get; set; }
             public string LaborRate { get; set; }
             public string PrinterCost { get; set; }
@@ -171,15 +200,35 @@ namespace PrintPricingCalculator
             public string HardwareCost { get; set; }
             public string PackagingCost { get; set; }
             public string Postage { get; set; }
+            public string TaxRate { get; set; }
+            public string Discount { get; set; }
+            public string SelectedMargin { get; set; }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Gather all current text box values into our data object
+            string marginSelection = "50";
+            if (rbMargin40.IsChecked == true)
+            {
+                marginSelection = "40";
+            }
+
+            if (rbMargin60.IsChecked == true)
+            {
+                marginSelection = "60";
+            }
+
+            if (rbMargin70.IsChecked == true)
+            {
+                marginSelection = "70";
+            }
+
             QuoteData data = new QuoteData
             {
                 FileName = txtFileName.Text,
                 DesignerName = txtDesignerName.Text,
+                QuoteNumber = txtQuoteNumber.Text,
+                CustomerName = txtCustomerName.Text,
                 Efficiency = txtEfficiency.Text,
                 LaborRate = txtLaborRate.Text,
                 PrinterCost = txtPrinterCost.Text,
@@ -197,18 +246,19 @@ namespace PrintPricingCalculator
                 LaborTime = txtLaborTime.Text,
                 HardwareCost = txtHardwareCost.Text,
                 PackagingCost = txtPackagingCost.Text,
-                Postage = txtPostage.Text
+                Postage = txtPostage.Text,
+                TaxRate = txtTaxRate.Text,
+                Discount = txtDiscount.Text,
+                SelectedMargin = marginSelection
             };
 
-            // 2. Open standard Windows Save File dialog
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "3D Print Quote (*.3dquote)|*.3dquote|JSON File (*.json)|*.json";
             saveFileDialog.Title = "Save Pricing Quote";
-            saveFileDialog.FileName = txtFileName.Text + " - Quote"; // Default file name
+            saveFileDialog.FileName = txtQuoteNumber.Text + " - " + txtFileName.Text;
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                // 3. Convert data to text and save to hard drive!
                 string jsonString = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(saveFileDialog.FileName, jsonString);
                 MessageBox.Show("Quote saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -217,7 +267,6 @@ namespace PrintPricingCalculator
 
         private void Load_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Open standard Windows Open File dialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "3D Print Quote (*.3dquote)|*.3dquote|JSON File (*.json)|*.json";
             openFileDialog.Title = "Load Pricing Quote";
@@ -226,13 +275,13 @@ namespace PrintPricingCalculator
             {
                 try
                 {
-                    // 2. Read the file and convert it back to our data object
                     string jsonString = File.ReadAllText(openFileDialog.FileName);
                     QuoteData data = JsonSerializer.Deserialize<QuoteData>(jsonString);
 
-                    // 3. Fill the UI text boxes back up!
                     txtFileName.Text = data.FileName;
                     txtDesignerName.Text = data.DesignerName;
+                    txtQuoteNumber.Text = data.QuoteNumber ?? "1001";
+                    txtCustomerName.Text = data.CustomerName ?? "Walk-in Customer";
                     txtEfficiency.Text = data.Efficiency;
                     txtLaborRate.Text = data.LaborRate;
                     txtPrinterCost.Text = data.PrinterCost;
@@ -251,68 +300,242 @@ namespace PrintPricingCalculator
                     txtHardwareCost.Text = data.HardwareCost;
                     txtPackagingCost.Text = data.PackagingCost;
                     txtPostage.Text = data.Postage;
+                    txtTaxRate.Text = data.TaxRate ?? "0.0";
+                    txtDiscount.Text = data.Discount ?? "0.0";
 
-                    // Automatically calculate pricing after loading
+                    string savedMargin = data.SelectedMargin ?? "50";
+                    if (savedMargin == "40") rbMargin40.IsChecked = true;
+                    else if (savedMargin == "50") rbMargin50.IsChecked = true;
+                    else if (savedMargin == "60") rbMargin60.IsChecked = true;
+                    else if (savedMargin == "70") rbMargin70.IsChecked = true;
+
                     Calculate_Click(null, null);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Could not load the file. It might be corrupted.\n\n" + ex.Message, "Error Loading File", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Could not load the file.\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
-        private void Print_Click(object sender, RoutedEventArgs e)
+        
+        private void AddTableRow(TableRowGroup group, string label, string value, bool isBold = false, Brush color = null, int fontSize = 14)
         {
-            // 1. Open the standard Windows Print Dialog
+            TableRow row = new TableRow();
+            Paragraph pLabel = new Paragraph(new Run(label)) { Margin = new Thickness(0, 5, 0, 5), FontSize = fontSize };
+
+            
+            string safeValue = string.IsNullOrWhiteSpace(value) ? " " : value;
+            Paragraph pValue = new Paragraph(new Run(safeValue)) { Margin = new Thickness(0, 5, 0, 5), FontSize = fontSize, TextAlignment = TextAlignment.Right };
+
+            if (isBold) { pLabel.FontWeight = FontWeights.Bold; pValue.FontWeight = FontWeights.Bold; }
+            if (color != null) { pLabel.Foreground = color; pValue.Foreground = color; }
+
+            row.Cells.Add(new TableCell(pLabel));
+            row.Cells.Add(new TableCell(pValue));
+            group.Rows.Add(row);
+        }
+
+        private void BuildHeader(FlowDocument doc, string title)
+        {
+            Table headerTable = new Table();
+            
+            headerTable.Columns.Add(new TableColumn() { Width = new GridLength(400) });
+            headerTable.Columns.Add(new TableColumn() { Width = new GridLength(250) });
+
+            TableRowGroup hrg = new TableRowGroup();
+            headerTable.RowGroups.Add(hrg);
+            TableRow hRow = new TableRow();
+
+            TableCell logoCell = new TableCell();
+            if (!string.IsNullOrWhiteSpace(txtLogoPath.Text) && File.Exists(txtLogoPath.Text))
+            {
+                try
+                {
+                    
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(txtLogoPath.Text, UriKind.Absolute);
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+
+                    Image logoImg = new Image();
+                    logoImg.Source = bitmap;
+                    logoImg.MaxHeight = 80;
+                    logoImg.MaxWidth = 250;
+                    logoImg.Stretch = Stretch.Uniform;
+                    logoImg.HorizontalAlignment = HorizontalAlignment.Left;
+
+                    logoCell.Blocks.Add(new BlockUIContainer(logoImg));
+                }
+                catch
+                {
+                    
+                }
+            }
+            hRow.Cells.Add(logoCell);
+
+            TableCell titleCell = new TableCell() { TextAlignment = TextAlignment.Right };
+            titleCell.Blocks.Add(new Paragraph(new Run(title)) { FontSize = 28, FontWeight = FontWeights.Bold, Foreground = Brushes.SteelBlue, Margin = new Thickness(0) });
+            titleCell.Blocks.Add(new Paragraph(new Run($"Quote #: {txtQuoteNumber.Text}")) { Margin = new Thickness(0, 5, 0, 0), FontSize = 14 });
+            titleCell.Blocks.Add(new Paragraph(new Run($"Date: {DateTime.Now.ToShortDateString()}")) { Margin = new Thickness(0), FontSize = 14 });
+            hRow.Cells.Add(titleCell);
+
+            hrg.Rows.Add(hRow);
+            doc.Blocks.Add(headerTable);
+
+           
+            doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
+
+            Paragraph pInfo = new Paragraph() { LineHeight = 22 };
+            pInfo.Inlines.Add(new Run("Project: ") { FontWeight = FontWeights.Bold });
+            pInfo.Inlines.Add(new Run(txtFileName.Text + "\n"));
+            pInfo.Inlines.Add(new Run("Customer: ") { FontWeight = FontWeights.Bold });
+            pInfo.Inlines.Add(new Run(txtCustomerName.Text + "\n"));
+            pInfo.Inlines.Add(new Run("Designer: ") { FontWeight = FontWeights.Bold });
+            pInfo.Inlines.Add(new Run(txtDesignerName.Text));
+            doc.Blocks.Add(pInfo);
+
+            
+            doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
+        }
+
+        private void PrintInternal_Click(object sender, RoutedEventArgs e)
+        {
             PrintDialog printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
             {
-                // 2. Build a clean "Invoice" document in memory
                 FlowDocument doc = new FlowDocument();
-                doc.PagePadding = new Thickness(50);
+
+               
+                doc.PageWidth = 793;
+                doc.PageHeight = 1056;
+                doc.PagePadding = new Thickness(40);
+                doc.ColumnWidth = 713; 
                 doc.FontFamily = new FontFamily("Segoe UI");
 
-                // Header
-                doc.Blocks.Add(new Paragraph(new Run("3D Print Pricing Quote")) { FontSize = 24, FontWeight = FontWeights.Bold });
-                doc.Blocks.Add(new Paragraph(new Run($"Date: {DateTime.Now.ToShortDateString()}")));
-                doc.Blocks.Add(new Paragraph(new Run($"Project: {txtFileName.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"Designer: {txtDesignerName.Text}")));
+                BuildHeader(doc, "INTERNAL QUOTE");
 
-                doc.Blocks.Add(new BlockUIContainer(new Separator()));
+                Table itemsTable = new Table();
+                
+                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
+                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
 
-                // Line Items 
-                doc.Blocks.Add(new Paragraph(new Run($"Materials Cost:\t{lblMaterialsCost.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"Labor Cost:\t{lblLaborCost.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"Machine Cost:\t{lblMachineCost.Text}")));
+                TableRowGroup irg = new TableRowGroup();
+                itemsTable.RowGroups.Add(irg);
 
-                doc.Blocks.Add(new BlockUIContainer(new Separator()));
+                AddTableRow(irg, "Materials Cost:", lblMaterialsCost.Text);
+                AddTableRow(irg, "Labor Cost:", lblLaborCost.Text);
+                AddTableRow(irg, "Machine Cost:", lblMachineCost.Text);
+                AddTableRow(irg, "Tax:", lblTaxCost.Text);
 
-                // Total
-                doc.Blocks.Add(new Paragraph(new Run($"Total Landed Cost: {lblLandedCost.Text}")) { FontSize = 18, FontWeight = FontWeights.Bold, Foreground = Brushes.DarkRed });
+                doc.Blocks.Add(itemsTable);
 
-                // Margin Pricing 
-                doc.Blocks.Add(new Paragraph(new Run("Suggested Retail Pricing:")) { FontWeight = FontWeights.Bold, Margin = new Thickness(0, 20, 0, 0) });
-                doc.Blocks.Add(new Paragraph(new Run($"40% Margin:\t{lblMargin40.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"50% Margin:\t{lblMargin50.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"60% Margin:\t{lblMargin60.Text}")));
-                doc.Blocks.Add(new Paragraph(new Run($"70% Margin:\t{lblMargin70.Text}")));
+                
+                doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
 
-                // 3. Send the document to the Printer or PDF Saver!
+                Table marginsTable = new Table();
+                marginsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
+                marginsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
+
+                TableRowGroup mrg = new TableRowGroup();
+                marginsTable.RowGroups.Add(mrg);
+
+                AddTableRow(mrg, "Total Landed Cost:", lblLandedCost.Text, true, Brushes.DarkRed, 16);
+                AddTableRow(mrg, "Suggested Retail Pricing:", " ", true, Brushes.Black, 16);
+                AddTableRow(mrg, "40% Margin:", lblMargin40.Text);
+                AddTableRow(mrg, "50% Margin:", lblMargin50.Text);
+                AddTableRow(mrg, "60% Margin:", lblMargin60.Text);
+                AddTableRow(mrg, "70% Margin:", lblMargin70.Text);
+                AddTableRow(mrg, "Applied Discount:", $"{txtDiscount.Text}%");
+
+                doc.Blocks.Add(marginsTable);
+
+               
+                doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
+
+                Paragraph finalP = new Paragraph(new Run($"Final Customer Quote: {lblFinalQuotePrice.Text}")) { FontSize = 20, FontWeight = FontWeights.Bold, Foreground = Brushes.ForestGreen, TextAlignment = TextAlignment.Right };
+                doc.Blocks.Add(finalP);
+
                 IDocumentPaginatorSource idpSource = doc;
-                printDialog.PrintDocument(idpSource.DocumentPaginator, "3D Print Quote");
+                printDialog.PrintDocument(idpSource.DocumentPaginator, "Internal Quote");
             }
         }
 
-        // --- DEFAULT SETTINGS LOGIC ---
+        private void PrintCustomer_Click(object sender, RoutedEventArgs e)
+        {
+            PrintDialog printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                FlowDocument doc = new FlowDocument();
+
+                doc.PageWidth = 793;
+                doc.PageHeight = 1056;
+                doc.PagePadding = new Thickness(40);
+                doc.ColumnWidth = 713;
+                doc.FontFamily = new FontFamily("Segoe UI");
+
+                BuildHeader(doc, "PROJECT QUOTE");
+
+                double landedCost = double.Parse(lblLandedCost.Text, System.Globalization.NumberStyles.Currency);
+                double baseChosenPrice = 0;
+                if (rbMargin40.IsChecked == true)
+                {
+                    baseChosenPrice = double.Parse(lblMargin40.Text, System.Globalization.NumberStyles.Currency);
+                }
+                else if (rbMargin50.IsChecked == true)
+                {
+                    baseChosenPrice = double.Parse(lblMargin50.Text, System.Globalization.NumberStyles.Currency);
+                }
+                else if (rbMargin60.IsChecked == true)
+                {
+                    baseChosenPrice = double.Parse(lblMargin60.Text, System.Globalization.NumberStyles.Currency);
+                }
+                else if (rbMargin70.IsChecked == true)
+                {
+                    baseChosenPrice = double.Parse(lblMargin70.Text, System.Globalization.NumberStyles.Currency);
+                }
+
+                double serviceFee = baseChosenPrice - landedCost;
+
+                Table itemsTable = new Table();
+               
+                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
+                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
+
+                TableRowGroup irg = new TableRowGroup();
+                itemsTable.RowGroups.Add(irg);
+
+                AddTableRow(irg, "Materials:", lblMaterialsCost.Text);
+                AddTableRow(irg, "Labor:", lblLaborCost.Text);
+                AddTableRow(irg, "Machine & Electricity:", lblMachineCost.Text);
+                AddTableRow(irg, "Tax:", lblTaxCost.Text);
+                AddTableRow(irg, "Customization & Service:", serviceFee.ToString("C"));
+
+                double discountPct = double.Parse(txtDiscount.Text);
+                if (discountPct > 0)
+                {
+                    AddTableRow(irg, "Discount Applied:", $"-{discountPct}%", true, Brushes.DarkRed);
+                }
+
+                doc.Blocks.Add(itemsTable);
+
+              
+                doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
+
+                Paragraph finalP = new Paragraph(new Run($"Total Due: {lblFinalQuotePrice.Text}")) { FontSize = 22, FontWeight = FontWeights.Bold, Foreground = Brushes.ForestGreen, TextAlignment = TextAlignment.Right };
+                doc.Blocks.Add(finalP);
+
+                IDocumentPaginatorSource idpSource = doc;
+                printDialog.PrintDocument(idpSource.DocumentPaginator, "Customer Quote");
+            }
+        }
+
         private void SaveDefaults_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Open the exact same registry key we used for Dark Mode
-                Microsoft.Win32.RegistryKey appKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
-
-                // Save the values the user wants to keep
+                RegistryKey appKey = Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
                 appKey.SetValue("DefElecCost", txtElecCost.Text);
                 appKey.SetValue("DefLaborRate", txtLaborRate.Text);
                 appKey.SetValue("DefEfficiency", txtEfficiency.Text);
@@ -322,12 +545,14 @@ namespace PrintPricingCalculator
                 appKey.SetValue("DefLicenseCost", txtLicenseCost.Text);
                 appKey.SetValue("DefExpectedSales", txtExpectedSales.Text);
                 appKey.SetValue("DefDesignerName", txtDesignerName.Text);
+                appKey.SetValue("DefTaxRate", txtTaxRate.Text);
+                appKey.SetValue("DefLogoPath", txtLogoPath.Text);
 
-                MessageBox.Show("Default rates saved successfully! These will load automatically next time you open the app.", "Defaults Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                _ = MessageBox.Show("Default rates & logo saved successfully!", "Defaults Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not save defaults: " + ex.Message);
+                _ = MessageBox.Show("Could not save defaults: " + ex.Message);
             }
         }
 
@@ -335,12 +560,9 @@ namespace PrintPricingCalculator
         {
             try
             {
-                // Check if our registry key exists
-                Microsoft.Win32.RegistryKey appKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\3BCCreations\PricingCalculator");
-
+                RegistryKey appKey = Registry.CurrentUser.OpenSubKey(@"Software\3BCCreations\PricingCalculator");
                 if (appKey != null)
                 {
-                    // If the values exist in the registry, plug them into the text boxes!
                     if (appKey.GetValue("DefElecCost") != null) txtElecCost.Text = appKey.GetValue("DefElecCost").ToString();
                     if (appKey.GetValue("DefLaborRate") != null) txtLaborRate.Text = appKey.GetValue("DefLaborRate").ToString();
                     if (appKey.GetValue("DefEfficiency") != null) txtEfficiency.Text = appKey.GetValue("DefEfficiency").ToString();
@@ -350,23 +572,18 @@ namespace PrintPricingCalculator
                     if (appKey.GetValue("DefLicenseCost") != null) txtLicenseCost.Text = appKey.GetValue("DefLicenseCost").ToString();
                     if (appKey.GetValue("DefExpectedSales") != null) txtExpectedSales.Text = appKey.GetValue("DefExpectedSales").ToString();
                     if (appKey.GetValue("DefDesignerName") != null) txtDesignerName.Text = appKey.GetValue("DefDesignerName").ToString();
+                    if (appKey.GetValue("DefTaxRate") != null) txtTaxRate.Text = appKey.GetValue("DefTaxRate").ToString();
+                    if (appKey.GetValue("DefLogoPath") != null) txtLogoPath.Text = appKey.GetValue("DefLogoPath").ToString();
                 }
             }
-            catch
-            {
-                // Silently ignore if this is their first time opening the app and nothing is saved yet
-            }
+            catch { }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
             lblSubtitle.Text = $"Your ultimate 3D print quote wizard | v{ver.Major}.{ver.Minor}.{ver.Build}";
-            // Load the user's custom rates FIRST
             LoadDefaults();
-
-            // The window is fully loaded, let's check our theme!
             LoadThemePreference();
         }
 
@@ -374,60 +591,36 @@ namespace PrintPricingCalculator
         {
             try
             {
-                // 1. Check if the user has manually saved a preference for OUR app before
                 RegistryKey appKey = Registry.CurrentUser.OpenSubKey(@"Software\3BCCreations\PricingCalculator");
-
                 if (appKey != null && appKey.GetValue("IsDarkMode") != null)
                 {
-                    // They have used the app before! Load their saved preference.
                     int savedMode = (int)appKey.GetValue("IsDarkMode");
                     chkDarkMode.IsChecked = (savedMode == 1);
                 }
                 else
                 {
-                    // 2. First time opening the app! Let's check the Windows System Theme.
                     RegistryKey winKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
                     if (winKey != null && winKey.GetValue("AppsUseLightTheme") != null)
                     {
                         int systemLightMode = (int)winKey.GetValue("AppsUseLightTheme");
-                        // If Windows is set to 0, it means the system is in Dark Mode
                         chkDarkMode.IsChecked = (systemLightMode == 0);
                     }
                 }
-
-                // 3. Actually apply the colors by triggering our existing Dark Mode code!
                 DarkMode_Click(null, null);
             }
-            catch
-            {
-                // If anything goes wrong (like a user on a very old Windows version), 
-                // silently ignore it and let the app stay in default Light Mode.
-            }
+            catch { }
         }
 
-        private void Input_TextChanged(object sender, TextChangedEventArgs e)
+        private void Input_TextChanged(object sender, RoutedEventArgs e)
         {
-            // Only try to auto-calculate if the window is fully loaded and visible.
-            // (This prevents the app from crashing while it's still drawing the text boxes on startup!)
-            if (this.IsLoaded)
+            if (IsLoaded)
             {
-                try
-                {
-                    // Force the Calculate button to "click" itself!
-                    Calculate_Click(null, null);
-                }
-                catch
-                {
-                    // If they backspace a number and the box is temporarily empty (""), 
-                    // the math will fail. We use this catch block to silently ignore 
-                    // the error until they type a new number!
-                }
+                try { Calculate_Click(null, null); } catch { }
             }
         }
 
         private void GitHubLogo_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            // This tells Windows to open the user's default web browser
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "https://github.com/Nate-DUDV2/PrintPricingCalculator",

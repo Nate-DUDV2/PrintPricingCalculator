@@ -1,173 +1,38 @@
 <div id="print-calculator-app" style="background-color: #1E1E1E; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; border-radius: 10px;">
     
     <style>
-        #print-calculator-app .svg-header {
-            text-align: left;
-            margin-bottom: 25px;
-        }
-        #print-calculator-app .svg-header a {
-            display: inline-block;
-            text-decoration: none;
-            transition: transform 0.2s ease-in-out;
-        }
-        #print-calculator-app .svg-header a:hover {
-            transform: scale(1.02); 
-        }
-        #print-calculator-app .svg-header svg {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0;
-        }
-        #print-calculator-app .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            align-items: start;
-        }
-        #print-calculator-app .card {
-            background-color: #252526;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.4);
-            margin-bottom: 20px;
-        }
-        #print-calculator-app .card-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: white;
-        }
-        #print-calculator-app details summary {
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            outline: none;
-            user-select: none;
-            list-style: none; 
-        }
-        #print-calculator-app details summary::-webkit-details-marker {
-            display: none; 
-        }
-        #print-calculator-app label {
-            display: block;
-            color: #CCCCCC;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        #print-calculator-app input[type="number"], 
-        #print-calculator-app input[type="text"] {
-            width: 100%;
-            height: 32px;
-            box-sizing: border-box;
-            background-color: white;
-            color: black;
-            border: none;
-            border-radius: 2px;
-            padding: 0 10px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        #print-calculator-app .result-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            color: #AAAAAA;
-        }
-        #print-calculator-app .result-value {
-            font-weight: bold;
-            color: white;
-        }
-        #print-calculator-app .hero-box {
-            background-color: #D83B01;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0 20px 0;
-        }
-        #print-calculator-app .hero-title {
-            color: #FAD8CC;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        #print-calculator-app .hero-price {
-            font-size: 36px;
-            font-weight: bold;
-            margin-top: 5px;
-            color: white;
-        }
-        #print-calculator-app .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        #print-calculator-app button {
-            height: 32px;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        #print-calculator-app .btn-group button {
-            width: 85px;
-        }
+        #print-calculator-app .svg-header { text-align: left; margin-bottom: 25px; }
+        #print-calculator-app .svg-header a { display: inline-block; text-decoration: none; transition: transform 0.2s ease-in-out; }
+        #print-calculator-app .svg-header a:hover { transform: scale(1.02); }
+        #print-calculator-app .svg-header svg { max-width: 100%; height: auto; display: block; margin: 0; }
+        #print-calculator-app .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
+        #print-calculator-app .card { background-color: #252526; border-radius: 10px; padding: 20px; box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.4); margin-bottom: 20px; }
+        #print-calculator-app .card-title { font-size: 18px; font-weight: bold; margin-top: 0; margin-bottom: 15px; color: white; }
+        #print-calculator-app details summary { font-size: 18px; font-weight: bold; cursor: pointer; outline: none; user-select: none; list-style: none; }
+        #print-calculator-app details summary::-webkit-details-marker { display: none; }
+        #print-calculator-app label { display: block; color: #CCCCCC; margin-top: 15px; margin-bottom: 5px; font-size: 14px; }
+        #print-calculator-app input[type="number"], #print-calculator-app input[type="text"] { width: 100%; height: 30px; box-sizing: border-box; background-color: white; color: black; border: none; border-radius: 2px; padding: 0 10px; font-size: 14px; font-weight: 500; }
+        #print-calculator-app .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; color: #AAAAAA; align-items: center;}
+        #print-calculator-app .result-value { font-weight: bold; color: white; }
+        #print-calculator-app .hero-box { background-color: #D83B01; border-radius: 8px; padding: 15px; margin: 15px 0 20px 0; }
+        #print-calculator-app .hero-title { color: #FAD8CC; font-size: 14px; font-weight: 600; }
+        #print-calculator-app .hero-price { font-size: 36px; font-weight: bold; margin-top: 5px; color: white; }
+        #print-calculator-app .final-quote-box { background-color: #107C10; border-radius: 8px; padding: 15px; margin: 20px 0 0 0; }
+        #print-calculator-app .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        #print-calculator-app button { height: 32px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; }
+        #print-calculator-app .btn-group button { flex: 1; }
         #print-calculator-app .btn-save { background-color: #107C10; }
         #print-calculator-app .btn-load { background-color: #0078D7; }
-        #print-calculator-app .btn-pdf { background-color: #606060; }
-        
-        #print-calculator-app .btn-default { 
-            background-color: #4A4A4A; 
-            width: 100%; 
-            margin-top: 20px;
-            padding: 8px 0;
-            height: auto;
-        }
-        #print-calculator-app .btn-default:hover {
-            background-color: #5A5A5A;
-        }
-
-        #print-calculator-app .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-        }
-        #print-calculator-app .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: #333333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            font-size: 12px;
-            font-weight: normal;
-            box-shadow: 0px 4px 8px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-        #print-calculator-app .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333333 transparent transparent transparent;
-        }
-        #print-calculator-app .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
+        #print-calculator-app .btn-browse { background-color: #4A4A4A; width: auto; padding: 0 15px; height: 30px;}
+        #print-calculator-app .btn-print-int { background-color: #4A4A4A; width: 100%; margin-top: 15px; }
+        #print-calculator-app .btn-print-cust { background-color: #D83B01; width: 100%; margin-top: 10px; }
+        #print-calculator-app .btn-default { background-color: #4A4A4A; width: 100%; margin-top: 20px; padding: 8px 0; height: auto; }
+        #print-calculator-app .btn-default:hover { background-color: #5A5A5A; }
+        #print-calculator-app .tooltip { position: relative; display: inline-block; cursor: help; }
+        #print-calculator-app .tooltip .tooltiptext { visibility: hidden; width: 200px; background-color: #333333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0; transition: opacity 0.2s; font-size: 12px; font-weight: normal; box-shadow: 0px 4px 8px rgba(0,0,0,0.5); pointer-events: none; }
+        #print-calculator-app .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333333 transparent transparent transparent; }
+        #print-calculator-app .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        #print-calculator-app input[type="radio"] { cursor: pointer; margin-right: 8px; accent-color: #D83B01;}
     </style>
 
     <div class="svg-header">
@@ -181,7 +46,7 @@
                 </g>
                 <text x="100" y="45" font-family="'Segoe UI', Tahoma, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF">Precision Cost Calculator for 3D Printing</text>
                 <text x="100" y="75" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#CCCCCC">Maximizing profits with effortless accuracy.</text>
-               <text x="100" y="98" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#888888">Your ultimate 3D print quote wizard | v2.2.0</text>
+                <text x="100" y="98" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#888888">Your ultimate 3D print quote wizard | v2.3.0</text>
             </svg>
         </a>
     </div>
@@ -191,7 +56,6 @@
         <div class="card">
             <details id="advancedExpander" open>
                 <summary class="card-title">⚙️ Shop & Machine Settings ▾</summary>
-                
                 <div style="margin-top: 15px;">
                     <label style="margin-top: 0;">Material Efficiency Factor <span class="tooltip">❓<span class="tooltiptext">Buffer for purged plastic, failed prints, and supports. (1.10 = +10%)</span></span></label>
                     <input type="number" id="txtEfficiency" value="1.10" step="0.01" oninput="calculate()">
@@ -222,7 +86,6 @@
 
                     <div style="border-top: 1px solid #444; margin-top: 25px; padding-top: 15px;">
                         <div class="card-title" style="font-size: 15px; color: #D83B01; margin-bottom: 5px;">📜 Licensing & Model Costs</div>
-                        
                         <label>License / Model Cost ($) <span class="tooltip">❓<span class="tooltiptext">Patreon sub fee, or a one-off STL purchase.</span></span></label>
                         <input type="number" id="txtLicenseCost" value="0.00" oninput="calculate()">
 
@@ -238,7 +101,6 @@
         <div>
             <div class="card">
                 <div class="card-title">🖨️ Core Print Details</div>
-                
                 <label style="margin-top: 0;">Filament Cost ($/kg)</label>
                 <input type="number" id="txtFilamentCost" value="20.0" oninput="calculate()">
 
@@ -259,6 +121,12 @@
                 
                 <label>Postage/Shipping ($)</label>
                 <input type="number" id="txtPostage" value="4.00" oninput="calculate()">
+
+                <label>Tax Rate (%)</label>
+                <input type="number" id="txtTaxRate" value="0.0" oninput="calculate()">
+
+                <label style="color:#107C10; font-weight:bold;">Discount (%)</label>
+                <input type="number" id="txtDiscount" value="0.0" oninput="calculate()" style="border: 2px solid #107C10;">
             </div>
         </div>
 
@@ -266,57 +134,75 @@
             <div class="card">
                 <div class="card-title">📊 Final Pricing</div>
                 
-                <div class="result-row">
-                    <span>Materials:</span>
-                    <span class="result-value" id="lblMaterialsCost">$0.00</span>
-                </div>
-                <div class="result-row">
-                    <span>Labor:</span>
-                    <span class="result-value" id="lblLaborCost">$0.00</span>
-                </div>
-                <div class="result-row" style="margin-bottom: 15px;">
-                    <span>Machine Wear:</span>
-                    <span class="result-value" id="lblMachineCost">$0.00</span>
-                </div>
+                <div class="result-row"><span>Materials:</span><span class="result-value" id="lblMaterialsCost">$0.00</span></div>
+                <div class="result-row"><span>Labor:</span><span class="result-value" id="lblLaborCost">$0.00</span></div>
+                <div class="result-row"><span>Machine Wear:</span><span class="result-value" id="lblMachineCost">$0.00</span></div>
+                <div class="result-row" style="margin-bottom: 15px;"><span>Tax:</span><span class="result-value" id="lblTaxCost">$0.00</span></div>
 
                 <div class="hero-box">
                     <div class="hero-title">Total Landed Cost:</div>
                     <div class="hero-price" id="lblLandedCost">$0.00</div>
                 </div>
 
-                <div style="color: white; font-weight: 600; margin-bottom: 10px;">Suggested Retail Pricing:</div>
-                <div class="result-row" style="color: #888888; margin-bottom: 5px;">
-                    <span>40% Margin:</span>
+                <div style="color: white; font-weight: 600; margin-bottom: 10px;">Select Margin for Customer Quote:</div>
+                <div class="result-row">
+                    <label style="margin:0; display:flex; align-items:center; cursor:pointer;"><input type="radio" name="marginSelect" value="40" onchange="calculate()"> 40% Margin:</label>
                     <span class="result-value" id="lblMargin40" style="color: #CCCCCC;">$0.00</span>
                 </div>
-                <div class="result-row" style="color: #888888; margin-bottom: 5px;">
-                    <span>50% Margin:</span>
+                <div class="result-row">
+                    <label style="margin:0; display:flex; align-items:center; cursor:pointer;"><input type="radio" name="marginSelect" value="50" onchange="calculate()" checked> 50% Margin:</label>
                     <span class="result-value" id="lblMargin50" style="color: #CCCCCC;">$0.00</span>
                 </div>
-                <div class="result-row" style="color: #888888; margin-bottom: 5px;">
-                    <span>60% Margin:</span>
+                <div class="result-row">
+                    <label style="margin:0; display:flex; align-items:center; cursor:pointer;"><input type="radio" name="marginSelect" value="60" onchange="calculate()"> 60% Margin:</label>
                     <span class="result-value" id="lblMargin60" style="color: #CCCCCC;">$0.00</span>
                 </div>
-                <div class="result-row" style="color: #888888;">
-                    <span>70% Margin:</span>
+                <div class="result-row">
+                    <label style="margin:0; display:flex; align-items:center; cursor:pointer;"><input type="radio" name="marginSelect" value="70" onchange="calculate()"> 70% Margin:</label>
                     <span class="result-value" id="lblMargin70" style="color: #CCCCCC;">$0.00</span>
+                </div>
+
+                <div class="final-quote-box">
+                    <div style="color: #DFF6DD; font-size: 14px; font-weight: 600;">Final Customer Quote (After Discount):</div>
+                    <div class="hero-price" id="lblFinalQuotePrice">$0.00</div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">📁 Project File</div>
+                <div class="card-title">📁 Project File & Quoting</div>
                 
-                <label style="margin-top: 0;">File / Part Name</label>
-                <input type="text" id="txtFileName" value="IceCream Print">
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex:1;">
+                        <label style="margin-top: 0;">Quote #</label>
+                        <input type="text" id="txtQuoteNumber" value="1001">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="margin-top: 0;">Customer Name</label>
+                        <input type="text" id="txtCustomerName" value="Walk-in Customer">
+                    </div>
+                </div>
 
-                <label>Designer Name</label>
-                <input type="text" id="txtDesignerName" value="Nates Print Shops">
+                <label>File / Part Name</label>
+                <input type="text" id="txtFileName" value="My Awesome Print">
+
+                <label>Designer / Shop Name</label>
+                <input type="text" id="txtDesignerName" value="Print Shop">
+
+                <label>Shop Logo (For Invoice Prints)</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="txtLogoFakePath" value="No logo selected..." readonly style="flex:1; background-color:#333; color:#aaa;">
+                    <button type="button" class="btn-browse" onclick="document.getElementById('fileLogo').click()">Browse</button>
+                    <input type="file" id="fileLogo" accept="image/*" style="display:none;" onchange="loadLogo(event)">
+                    <input type="hidden" id="txtLogoBase64" value="">
+                </div>
 
                 <div class="btn-group">
                     <button type="button" class="btn-save" onclick="saveQuote()">💾 Save</button>
                     <button type="button" class="btn-load" onclick="triggerLoad()">📂 Load</button>
-                    <button type="button" class="btn-pdf" onclick="window.print()">🖨️ PDF</button>
                 </div>
+
+                <button type="button" class="btn-print-int" onclick="printInternal()">🖨️ PDF (Internal Copy)</button>
+                <button type="button" class="btn-print-cust" onclick="printCustomer()">🖨️ PDF (Customer Quote)</button>
                 
                 <input type="file" id="fileLoader" style="display:none;" accept=".3dquote,.json" onchange="loadQuote(event)">
             </div>
@@ -344,11 +230,11 @@
                 let hardwareCost = parseFloat(document.getElementById('txtHardwareCost').value) || 0;
                 let packagingCost = parseFloat(document.getElementById('txtPackagingCost').value) || 0;
                 let postageCost = parseFloat(document.getElementById('txtPostage').value) || 0;
+                let taxPct = parseFloat(document.getElementById('txtTaxRate').value) || 0;
+                let discountPct = parseFloat(document.getElementById('txtDiscount').value) || 0;
 
-                // Streamlined License Math
                 let licenseCost = parseFloat(document.getElementById('txtLicenseCost').value) || 0;
                 let expectedSales = parseFloat(document.getElementById('txtExpectedSales').value) || 1;
-                // Prevent division by zero if user clears the box
                 if (expectedSales <= 0) expectedSales = 1; 
                 let appliedLicenseCost = licenseCost / expectedSales;
 
@@ -363,24 +249,51 @@
                 let baseMachineCostPerHour = depreciationPerHour + maintenancePerHour + electricityPerHour;
                 let machCost = (baseMachineCostPerHour * machineBuffer) * printTimeHr;
                 
-                // FINAL SUM
-                let totalCost = matCost + labCost + machCost + hardwareCost + packagingCost + postageCost + appliedLicenseCost;
+                let preTaxCost = matCost + labCost + machCost + hardwareCost + packagingCost + postageCost + appliedLicenseCost;
+                let taxAmount = preTaxCost * (taxPct / 100);
+                let landedCost = preTaxCost + taxAmount;
 
                 const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
                 
                 document.getElementById('lblMaterialsCost').innerText = formatter.format(matCost);
                 document.getElementById('lblLaborCost').innerText = formatter.format(labCost);
                 document.getElementById('lblMachineCost').innerText = formatter.format(machCost);
-                document.getElementById('lblLandedCost').innerText = formatter.format(totalCost);
+                document.getElementById('lblTaxCost').innerText = formatter.format(taxAmount);
+                document.getElementById('lblLandedCost').innerText = formatter.format(landedCost);
                 
-                document.getElementById('lblMargin40').innerText = formatter.format(totalCost / 0.60);
-                document.getElementById('lblMargin50').innerText = formatter.format(totalCost / 0.50);
-                document.getElementById('lblMargin60').innerText = formatter.format(totalCost / 0.40);
-                document.getElementById('lblMargin70').innerText = formatter.format(totalCost / 0.30);
+                let price40 = landedCost / 0.60;
+                let price50 = landedCost / 0.50;
+                let price60 = landedCost / 0.40;
+                let price70 = landedCost / 0.30;
+
+                document.getElementById('lblMargin40').innerText = formatter.format(price40);
+                document.getElementById('lblMargin50').innerText = formatter.format(price50);
+                document.getElementById('lblMargin60').innerText = formatter.format(price60);
+                document.getElementById('lblMargin70').innerText = formatter.format(price70);
+
+                let selectedRadio = document.querySelector('input[name="marginSelect"]:checked').value;
+                let baseChosenPrice = 0;
+                if (selectedRadio === "40") baseChosenPrice = price40;
+                if (selectedRadio === "50") baseChosenPrice = price50;
+                if (selectedRadio === "60") baseChosenPrice = price60;
+                if (selectedRadio === "70") baseChosenPrice = price70;
+
+                let finalQuote = baseChosenPrice * (1 - (discountPct / 100));
+                document.getElementById('lblFinalQuotePrice').innerText = formatter.format(finalQuote);
             } catch (e) { }
         }
 
-        // --- NEW DEFAULTS LOGIC ---
+        function loadLogo(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            document.getElementById('txtLogoFakePath').value = file.name;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('txtLogoBase64').value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function saveDefaults() {
             let defaultsData = {
                 txtEfficiency: document.getElementById('txtEfficiency').value,
@@ -393,13 +306,14 @@
                 txtElecCost: document.getElementById('txtElecCost').value,
                 txtBuffer: document.getElementById('txtBuffer').value,
                 txtLicenseCost: document.getElementById('txtLicenseCost').value,
-                txtExpectedSales: document.getElementById('txtExpectedSales').value
-				txtDesignerName: document.getElementById('txtDesignerName').value
+                txtExpectedSales: document.getElementById('txtExpectedSales').value,
+                txtDesignerName: document.getElementById('txtDesignerName').value,
+                txtTaxRate: document.getElementById('txtTaxRate').value,
+                txtLogoBase64: document.getElementById('txtLogoBase64').value,
+                txtLogoFakePath: document.getElementById('txtLogoFakePath').value
             };
-
-            // Save to browser's local storage
             localStorage.setItem('printCalcDefaults', JSON.stringify(defaultsData));
-            alert("Default rates saved successfully! These will load automatically next time you open the app.");
+            alert("Default rates & logo saved successfully!");
         }
 
         function loadDefaults() {
@@ -412,12 +326,9 @@
                             document.getElementById(key).value = defaultsData[key];
                         }
                     }
-                } catch (err) {
-                    console.error("Could not load default settings", err);
-                }
+                } catch (err) {}
             }
         }
-        // ---------------------------
 
         function saveQuote() {
             let quoteData = {
@@ -439,8 +350,13 @@
                 txtHardwareCost: document.getElementById('txtHardwareCost').value,
                 txtPackagingCost: document.getElementById('txtPackagingCost').value,
                 txtPostage: document.getElementById('txtPostage').value,
+                txtTaxRate: document.getElementById('txtTaxRate').value,
+                txtDiscount: document.getElementById('txtDiscount').value,
                 txtFileName: document.getElementById('txtFileName').value,
-                txtDesignerName: document.getElementById('txtDesignerName').value
+                txtDesignerName: document.getElementById('txtDesignerName').value,
+                txtCustomerName: document.getElementById('txtCustomerName').value,
+                txtQuoteNumber: document.getElementById('txtQuoteNumber').value,
+                selectedMargin: document.querySelector('input[name="marginSelect"]:checked').value
             };
 
             let dataStr = JSON.stringify(quoteData, null, 2);
@@ -448,7 +364,7 @@
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
-            a.download = (document.getElementById('txtFileName').value.trim() || "3D_Quote") + ".3dquote";
+            a.download = (document.getElementById('txtQuoteNumber').value + " - " + document.getElementById('txtFileName').value.trim() || "3D_Quote") + ".3dquote";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -471,6 +387,9 @@
                             document.getElementById(key).value = quoteData[key];
                         }
                     }
+                    if (quoteData.selectedMargin) {
+                        document.querySelector(`input[name="marginSelect"][value="${quoteData.selectedMargin}"]`).checked = true;
+                    }
                     calculate();
                 } catch (err) {
                     alert("Error loading file!");
@@ -480,7 +399,102 @@
             event.target.value = "";
         }
 
-        // Check for defaults before doing the very first calculation!
+        function buildPrintHeader(title) {
+            let logoHtml = "";
+            let base64Logo = document.getElementById('txtLogoBase64').value;
+            if (base64Logo) {
+                logoHtml = `<img src="${base64Logo}" style="max-height: 80px; max-width: 250px;">`;
+            }
+
+            return `
+                <table style="width: 100%; margin-bottom: 20px;">
+                    <tr>
+                        <td style="width: 50%; vertical-align: bottom;">${logoHtml}</td>
+                        <td style="width: 50%; text-align: right; vertical-align: bottom;">
+                            <div style="font-size: 28px; font-weight: bold; color: steelblue; margin-bottom: 5px;">${title}</div>
+                            <div>Quote #: ${document.getElementById('txtQuoteNumber').value}</div>
+                            <div>Date: ${new Date().toLocaleDateString()}</div>
+                        </td>
+                    </tr>
+                </table>
+                <hr>
+                <div style="line-height: 1.6;">
+                    <b>Project:</b> ${document.getElementById('txtFileName').value}<br>
+                    <b>Customer:</b> ${document.getElementById('txtCustomerName').value}<br>
+                    <b>Designer:</b> ${document.getElementById('txtDesignerName').value}
+                </div>
+                <hr>
+            `;
+        }
+
+        function printInternal() {
+            let html = `<html><head><title>Internal Quote</title><style>body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; } table.items { width: 100%; border-collapse: collapse; } table.items td { padding: 5px 0; } table.items td:nth-child(2) { text-align: right; } .bold { font-weight: bold; } .red { color: darkred; font-size: 18px; } .green { color: forestgreen; font-size: 20px;} hr { margin: 20px 0; border: 1px solid #ccc; }</style></head><body>`;
+            
+            html += buildPrintHeader("INTERNAL QUOTE");
+
+            html += `<table class="items">`;
+            html += `<tr><td>Materials Cost:</td><td>${document.getElementById('lblMaterialsCost').innerText}</td></tr>`;
+            html += `<tr><td>Labor Cost:</td><td>${document.getElementById('lblLaborCost').innerText}</td></tr>`;
+            html += `<tr><td>Machine Cost:</td><td>${document.getElementById('lblMachineCost').innerText}</td></tr>`;
+            html += `<tr><td>Tax:</td><td>${document.getElementById('lblTaxCost').innerText}</td></tr>`;
+            html += `</table><hr>`;
+            
+            html += `<table class="items">`;
+            html += `<tr class="bold red"><td>Total Landed Cost:</td><td>${document.getElementById('lblLandedCost').innerText}</td></tr>`;
+            html += `</table><hr>`;
+            
+            html += `<h3>Suggested Retail Pricing:</h3>`;
+            html += `<table class="items">`;
+            html += `<tr><td>40% Margin:</td><td>${document.getElementById('lblMargin40').innerText}</td></tr>`;
+            html += `<tr><td>50% Margin:</td><td>${document.getElementById('lblMargin50').innerText}</td></tr>`;
+            html += `<tr><td>60% Margin:</td><td>${document.getElementById('lblMargin60').innerText}</td></tr>`;
+            html += `<tr><td>70% Margin:</td><td>${document.getElementById('lblMargin70').innerText}</td></tr>`;
+            html += `</table><hr>`;
+            
+            html += `<table class="items">`;
+            html += `<tr><td>Applied Discount:</td><td>${document.getElementById('txtDiscount').value}%</td></tr>`;
+            html += `<tr class="bold green"><td>Final Customer Quote:</td><td>${document.getElementById('lblFinalQuotePrice').innerText}</td></tr>`;
+            html += `</table>`;
+
+            html += `<script>window.print(); window.close();<\/script></body></html>`;
+            let printWin = window.open('', '_blank');
+            printWin.document.write(html);
+            printWin.document.close();
+        }
+
+        function printCustomer() {
+            let landedRaw = parseFloat(document.getElementById('lblLandedCost').innerText.replace(/[^0-9.-]+/g,""));
+            let marginChoice = document.querySelector('input[name="marginSelect"]:checked').value;
+            let baseRaw = parseFloat(document.getElementById('lblMargin' + marginChoice).innerText.replace(/[^0-9.-]+/g,""));
+            let serviceFee = baseRaw - landedRaw;
+            let formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+            let html = `<html><head><title>Project Quote</title><style>body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; } table.items { width: 100%; border-collapse: collapse; } table.items td { padding: 5px 0; } table.items td:nth-child(2) { text-align: right; } .bold { font-weight: bold; } .green { color: forestgreen; font-size: 24px;} .discount { color: darkred; font-weight: bold; } hr { margin: 20px 0; border: 1px solid #ccc; }</style></head><body>`;
+            
+            html += buildPrintHeader("PROJECT QUOTE");
+
+            html += `<table class="items">`;
+            html += `<tr><td>Materials:</td><td>${document.getElementById('lblMaterialsCost').innerText}</td></tr>`;
+            html += `<tr><td>Labor:</td><td>${document.getElementById('lblLaborCost').innerText}</td></tr>`;
+            html += `<tr><td>Machine & Electricity:</td><td>${document.getElementById('lblMachineCost').innerText}</td></tr>`;
+            html += `<tr><td>Tax:</td><td>${document.getElementById('lblTaxCost').innerText}</td></tr>`;
+            html += `<tr><td>Customization & Service:</td><td>${formatter.format(serviceFee)}</td></tr>`;
+            html += `</table><hr>`;
+            
+            html += `<table class="items">`;
+            let disc = parseFloat(document.getElementById('txtDiscount').value);
+            if (disc > 0) {
+                html += `<tr class="discount"><td>Discount Applied:</td><td>-${disc}%</td></tr>`;
+            }
+            html += `<tr class="bold green"><td style="padding-top:15px;">Total Due:</td><td style="padding-top:15px;">${document.getElementById('lblFinalQuotePrice').innerText}</td></tr>`;
+            html += `</table>`;
+
+            html += `<script>window.print(); window.close();<\/script></body></html>`;
+            let printWin = window.open('', '_blank');
+            printWin.document.write(html);
+            printWin.document.close();
+        }
+
         loadDefaults();
         calculate();
     </script>
