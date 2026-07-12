@@ -24,8 +24,7 @@
         #print-calculator-app .btn-save { background-color: #107C10; }
         #print-calculator-app .btn-load { background-color: #0078D7; }
         #print-calculator-app .btn-browse { background-color: #4A4A4A; width: auto; padding: 0 15px; height: 30px;}
-        #print-calculator-app .btn-print-int { background-color: #4A4A4A; width: 100%; margin-top: 15px; }
-        #print-calculator-app .btn-print-cust { background-color: #D83B01; width: 100%; margin-top: 10px; }
+        #print-calculator-app .btn-print-main { background-color: #D83B01; width: 100%; margin-top: 10px; height: 34px;}
         #print-calculator-app .btn-default { background-color: #4A4A4A; width: 100%; margin-top: 20px; padding: 8px 0; height: auto; }
         #print-calculator-app .btn-default:hover { background-color: #5A5A5A; }
         #print-calculator-app .tooltip { position: relative; display: inline-block; cursor: help; }
@@ -42,7 +41,7 @@
                 <g transform="translate(20, 20)" stroke="#D83B01" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round">
                     <polygon points="40,10 66,25 66,55 40,70 14,55 14,25" />
                     <polyline points="14,25 40,40 66,25" />
-                    <line x1="40" y1="40" x2="40" y2="70" />
+                    <line x1="40" y1="40" X2="40" Y2="70" />
                 </g>
                 <text x="100" y="45" font-family="'Segoe UI', Tahoma, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF">Precision Cost Calculator for 3D Printing</text>
                 <text x="100" y="75" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#CCCCCC">Maximizing profits with effortless accuracy.</text>
@@ -86,8 +85,17 @@
 
                     <div style="border-top: 1px solid #444; margin-top: 25px; padding-top: 15px;">
                         <div class="card-title" style="font-size: 15px; color: #D83B01; margin-bottom: 5px;">📜 Licensing & Model Costs</div>
-                        <label>License / Model Cost ($) <span class="tooltip">❓<span class="tooltiptext">Patreon sub fee, or a one-off STL purchase.</span></span></label>
-                        <input type="number" id="txtLicenseCost" value="0.00" oninput="calculate()">
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex:1;">
+                                <label style="margin-top: 0;">Cost ($) <span class="tooltip">❓<span class="tooltiptext">Patreon sub fee, or a one-off STL purchase.</span></span></label>
+                                <input type="number" id="txtLicenseCost" value="0.00" oninput="calculate()">
+                            </div>
+                            <div style="flex:1;">
+                                <label style="margin-top: 0;">Creator Name</label>
+                                <input type="text" id="txtCreatorName" value="Unknown">
+                            </div>
+                        </div>
 
                         <label>Expected Sales <span class="tooltip">❓<span class="tooltiptext">Set to 1 for a one-off print. Set higher to spread a sub cost across multiple prints.</span></span></label>
                         <input type="number" id="txtExpectedSales" value="1" oninput="calculate()">
@@ -173,7 +181,7 @@
                 
                 <div style="display: flex; gap: 10px;">
                     <div style="flex:1;">
-                        <label style="margin-top: 0;">Quote #</label>
+                        <label style="margin-top: 0;">Quote # <span class="tooltip">❓<span class="tooltiptext">Bumps up by 1 automatically after printing a Customer copy. Saved to defaults!</span></span></label>
                         <input type="text" id="txtQuoteNumber" value="1001">
                     </div>
                     <div style="flex:1;">
@@ -196,13 +204,21 @@
                     <input type="hidden" id="txtLogoBase64" value="">
                 </div>
 
-                <div class="btn-group">
-                    <button type="button" class="btn-save" onclick="saveQuote()">💾 Save</button>
-                    <button type="button" class="btn-load" onclick="triggerLoad()">📂 Load</button>
+                <div class="btn-group" style="margin-bottom: 15px;">
+                    <button type="button" class="btn-save" onclick="saveQuote()">💾 Save Project</button>
+                    <button type="button" class="btn-load" onclick="triggerLoad()">📂 Load Project</button>
                 </div>
 
-                <button type="button" class="btn-print-int" onclick="printInternal()">🖨️ PDF (Internal Copy)</button>
-                <button type="button" class="btn-print-cust" onclick="printCustomer()">🖨️ PDF (Customer Quote)</button>
+                <div style="color: white; font-weight: 600; margin-bottom: 5px;">Print Output Type:</div>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <label style="display:flex; align-items:center; cursor:pointer; color:#ccc; font-size:14px; margin: 0;">
+                        <input type="radio" name="printMode" value="customer" checked> Customer Quote
+                    </label>
+                    <label style="display:flex; align-items:center; cursor:pointer; color:#ccc; font-size:14px; margin: 0;">
+                        <input type="radio" name="printMode" value="internal"> Internal Copy
+                    </label>
+                </div>
+                <button type="button" class="btn-print-main" onclick="executePrint()">🖨️ Generate PDF</button>
                 
                 <input type="file" id="fileLoader" style="display:none;" accept=".3dquote,.json" onchange="loadQuote(event)">
             </div>
@@ -306,11 +322,13 @@
                 txtElecCost: document.getElementById('txtElecCost').value,
                 txtBuffer: document.getElementById('txtBuffer').value,
                 txtLicenseCost: document.getElementById('txtLicenseCost').value,
+                txtCreatorName: document.getElementById('txtCreatorName').value,
                 txtExpectedSales: document.getElementById('txtExpectedSales').value,
                 txtDesignerName: document.getElementById('txtDesignerName').value,
                 txtTaxRate: document.getElementById('txtTaxRate').value,
                 txtLogoBase64: document.getElementById('txtLogoBase64').value,
-                txtLogoFakePath: document.getElementById('txtLogoFakePath').value
+                txtLogoFakePath: document.getElementById('txtLogoFakePath').value,
+                txtQuoteNumber: document.getElementById('txtQuoteNumber').value
             };
             localStorage.setItem('printCalcDefaults', JSON.stringify(defaultsData));
             alert("Default rates & logo saved successfully!");
@@ -342,6 +360,7 @@
                 txtElecCost: document.getElementById('txtElecCost').value,
                 txtBuffer: document.getElementById('txtBuffer').value,
                 txtLicenseCost: document.getElementById('txtLicenseCost').value,
+                txtCreatorName: document.getElementById('txtCreatorName').value,
                 txtExpectedSales: document.getElementById('txtExpectedSales').value,
                 txtFilamentCost: document.getElementById('txtFilamentCost').value,
                 txtFilamentReq: document.getElementById('txtFilamentReq').value,
@@ -421,78 +440,95 @@
                 <div style="line-height: 1.6;">
                     <b>Project:</b> ${document.getElementById('txtFileName').value}<br>
                     <b>Customer:</b> ${document.getElementById('txtCustomerName').value}<br>
-                    <b>Designer:</b> ${document.getElementById('txtDesignerName').value}
+                    <b>Designer:</b> ${document.getElementById('txtDesignerName').value}<br>
+                    <b>Model Creator:</b> ${document.getElementById('txtCreatorName').value}
                 </div>
                 <hr>
             `;
         }
 
-        function printInternal() {
-            let html = `<html><head><title>Internal Quote</title><style>body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; } table.items { width: 100%; border-collapse: collapse; } table.items td { padding: 5px 0; } table.items td:nth-child(2) { text-align: right; } .bold { font-weight: bold; } .red { color: darkred; font-size: 18px; } .green { color: forestgreen; font-size: 20px;} hr { margin: 20px 0; border: 1px solid #ccc; }</style></head><body>`;
+        function executePrint() {
+            let mode = document.querySelector('input[name="printMode"]:checked').value;
             
-            html += buildPrintHeader("INTERNAL QUOTE");
+            let html = `<html><head><title>${mode === 'internal' ? 'Internal Quote' : 'Project Quote'}</title>
+                        <style>body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; } 
+                        table.items { width: 100%; border-collapse: collapse; } 
+                        table.items td { padding: 5px 0; } 
+                        table.items td:nth-child(2) { text-align: right; } 
+                        .bold { font-weight: bold; } 
+                        .red { color: darkred; font-size: 18px; } 
+                        .green { color: forestgreen; font-size: ${mode === 'internal' ? '20px' : '24px'};} 
+                        .discount { color: darkred; font-weight: bold; }
+                        hr { margin: 20px 0; border: 1px solid #ccc; }</style></head><body>`;
+            
+            html += buildPrintHeader(mode === 'internal' ? "INTERNAL QUOTE" : "PROJECT QUOTE");
 
-            html += `<table class="items">`;
-            html += `<tr><td>Materials Cost:</td><td>${document.getElementById('lblMaterialsCost').innerText}</td></tr>`;
-            html += `<tr><td>Labor Cost:</td><td>${document.getElementById('lblLaborCost').innerText}</td></tr>`;
-            html += `<tr><td>Machine Cost:</td><td>${document.getElementById('lblMachineCost').innerText}</td></tr>`;
-            html += `<tr><td>Tax:</td><td>${document.getElementById('lblTaxCost').innerText}</td></tr>`;
-            html += `</table><hr>`;
-            
-            html += `<table class="items">`;
-            html += `<tr class="bold red"><td>Total Landed Cost:</td><td>${document.getElementById('lblLandedCost').innerText}</td></tr>`;
-            html += `</table><hr>`;
-            
-            html += `<h3>Suggested Retail Pricing:</h3>`;
-            html += `<table class="items">`;
-            html += `<tr><td>40% Margin:</td><td>${document.getElementById('lblMargin40').innerText}</td></tr>`;
-            html += `<tr><td>50% Margin:</td><td>${document.getElementById('lblMargin50').innerText}</td></tr>`;
-            html += `<tr><td>60% Margin:</td><td>${document.getElementById('lblMargin60').innerText}</td></tr>`;
-            html += `<tr><td>70% Margin:</td><td>${document.getElementById('lblMargin70').innerText}</td></tr>`;
-            html += `</table><hr>`;
-            
-            html += `<table class="items">`;
-            html += `<tr><td>Applied Discount:</td><td>${document.getElementById('txtDiscount').value}%</td></tr>`;
-            html += `<tr class="bold green"><td>Final Customer Quote:</td><td>${document.getElementById('lblFinalQuotePrice').innerText}</td></tr>`;
-            html += `</table>`;
+            if (mode === 'internal') {
+                html += `<table class="items">`;
+                html += `<tr><td>Materials Cost:</td><td>${document.getElementById('lblMaterialsCost').innerText}</td></tr>`;
+                html += `<tr><td>Labor Cost:</td><td>${document.getElementById('lblLaborCost').innerText}</td></tr>`;
+                html += `<tr><td>Machine Cost:</td><td>${document.getElementById('lblMachineCost').innerText}</td></tr>`;
+                html += `<tr><td>Tax:</td><td>${document.getElementById('lblTaxCost').innerText}</td></tr>`;
+                html += `</table><hr>`;
+                
+                html += `<table class="items">`;
+                html += `<tr class="bold red"><td>Total Landed Cost:</td><td>${document.getElementById('lblLandedCost').innerText}</td></tr>`;
+                html += `</table><hr>`;
+                
+                html += `<h3>Suggested Retail Pricing:</h3>`;
+                html += `<table class="items">`;
+                html += `<tr><td>40% Margin:</td><td>${document.getElementById('lblMargin40').innerText}</td></tr>`;
+                html += `<tr><td>50% Margin:</td><td>${document.getElementById('lblMargin50').innerText}</td></tr>`;
+                html += `<tr><td>60% Margin:</td><td>${document.getElementById('lblMargin60').innerText}</td></tr>`;
+                html += `<tr><td>70% Margin:</td><td>${document.getElementById('lblMargin70').innerText}</td></tr>`;
+                html += `</table><hr>`;
+                
+                html += `<table class="items">`;
+                html += `<tr><td>Applied Discount:</td><td>${document.getElementById('txtDiscount').value}%</td></tr>`;
+                html += `<tr class="bold green"><td>Final Customer Quote:</td><td>${document.getElementById('lblFinalQuotePrice').innerText}</td></tr>`;
+                html += `</table>`;
+            } else {
+                let landedRaw = parseFloat(document.getElementById('lblLandedCost').innerText.replace(/[^0-9.-]+/g,""));
+                let marginChoice = document.querySelector('input[name="marginSelect"]:checked').value;
+                let baseRaw = parseFloat(document.getElementById('lblMargin' + marginChoice).innerText.replace(/[^0-9.-]+/g,""));
+                let serviceFee = baseRaw - landedRaw;
+                let formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
-            html += `<script>window.print(); window.close();<\/script></body></html>`;
-            let printWin = window.open('', '_blank');
-            printWin.document.write(html);
-            printWin.document.close();
-        }
-
-        function printCustomer() {
-            let landedRaw = parseFloat(document.getElementById('lblLandedCost').innerText.replace(/[^0-9.-]+/g,""));
-            let marginChoice = document.querySelector('input[name="marginSelect"]:checked').value;
-            let baseRaw = parseFloat(document.getElementById('lblMargin' + marginChoice).innerText.replace(/[^0-9.-]+/g,""));
-            let serviceFee = baseRaw - landedRaw;
-            let formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-
-            let html = `<html><head><title>Project Quote</title><style>body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; } table.items { width: 100%; border-collapse: collapse; } table.items td { padding: 5px 0; } table.items td:nth-child(2) { text-align: right; } .bold { font-weight: bold; } .green { color: forestgreen; font-size: 24px;} .discount { color: darkred; font-weight: bold; } hr { margin: 20px 0; border: 1px solid #ccc; }</style></head><body>`;
-            
-            html += buildPrintHeader("PROJECT QUOTE");
-
-            html += `<table class="items">`;
-            html += `<tr><td>Materials:</td><td>${document.getElementById('lblMaterialsCost').innerText}</td></tr>`;
-            html += `<tr><td>Labor:</td><td>${document.getElementById('lblLaborCost').innerText}</td></tr>`;
-            html += `<tr><td>Machine & Electricity:</td><td>${document.getElementById('lblMachineCost').innerText}</td></tr>`;
-            html += `<tr><td>Tax:</td><td>${document.getElementById('lblTaxCost').innerText}</td></tr>`;
-            html += `<tr><td>Customization & Service:</td><td>${formatter.format(serviceFee)}</td></tr>`;
-            html += `</table><hr>`;
-            
-            html += `<table class="items">`;
-            let disc = parseFloat(document.getElementById('txtDiscount').value);
-            if (disc > 0) {
-                html += `<tr class="discount"><td>Discount Applied:</td><td>-${disc}%</td></tr>`;
+                html += `<table class="items">`;
+                html += `<tr><td>Materials:</td><td>${document.getElementById('lblMaterialsCost').innerText}</td></tr>`;
+                html += `<tr><td>Labor:</td><td>${document.getElementById('lblLaborCost').innerText}</td></tr>`;
+                html += `<tr><td>Machine & Electricity:</td><td>${document.getElementById('lblMachineCost').innerText}</td></tr>`;
+                html += `<tr><td>Tax:</td><td>${document.getElementById('lblTaxCost').innerText}</td></tr>`;
+                html += `<tr><td>Customization & Service:</td><td>${formatter.format(serviceFee)}</td></tr>`;
+                html += `</table><hr>`;
+                
+                html += `<table class="items">`;
+                let disc = parseFloat(document.getElementById('txtDiscount').value);
+                if (disc > 0) {
+                    html += `<tr class="discount"><td>Discount Applied:</td><td>-${disc}%</td></tr>`;
+                }
+                html += `<tr class="bold green"><td style="padding-top:15px;">Total Due:</td><td style="padding-top:15px;">${document.getElementById('lblFinalQuotePrice').innerText}</td></tr>`;
+                html += `</table>`;
             }
-            html += `<tr class="bold green"><td style="padding-top:15px;">Total Due:</td><td style="padding-top:15px;">${document.getElementById('lblFinalQuotePrice').innerText}</td></tr>`;
-            html += `</table>`;
 
             html += `<script>window.print(); window.close();<\/script></body></html>`;
             let printWin = window.open('', '_blank');
             printWin.document.write(html);
             printWin.document.close();
+
+            // AUTO-INCREMENT QUOTE NUMBER (ONLY FOR CUSTOMER MODE)
+            if (mode === 'customer') {
+                let currentQuote = parseInt(document.getElementById('txtQuoteNumber').value, 10);
+                if (!isNaN(currentQuote)) {
+                    let nextQuote = currentQuote + 1;
+                    document.getElementById('txtQuoteNumber').value = nextQuote;
+                    
+                    let savedDefaults = localStorage.getItem('printCalcDefaults');
+                    let defaultsData = savedDefaults ? JSON.parse(savedDefaults) : {};
+                    defaultsData['txtQuoteNumber'] = nextQuote;
+                    localStorage.setItem('printCalcDefaults', JSON.stringify(defaultsData));
+                }
+            }
         }
 
         loadDefaults();

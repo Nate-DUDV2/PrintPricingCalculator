@@ -156,14 +156,26 @@
                             <Separator Background="#444" Margin="0,10,0,10"/>
                             <TextBlock Text="📜 Licensing &amp; Model Costs" FontSize="15" FontWeight="Bold" Foreground="#D83B01" Margin="0,0,0,10"/>
 
-                            <TextBlock Text="License / Model Cost ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
-                                <TextBlock.ToolTip>
-                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
-                                        <TextBlock TextWrapping="Wrap" Text="Patreon sub fee, or a one-off STL purchase."/>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-                            <TextBox x:Name="txtLicenseCost" Text="0.00"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                    <TextBlock Text="Cost ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                        <TextBlock.ToolTip>
+                                            <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                                <TextBlock TextWrapping="Wrap" Text="Patreon sub fee, or a one-off STL purchase."/>
+                                            </ToolTip>
+                                        </TextBlock.ToolTip>
+                                    </TextBlock>
+                                    <TextBox x:Name="txtLicenseCost" Text="0.00"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                                    <TextBlock Text="Creator Name" Foreground="{DynamicResource SecondaryText}"/>
+                                    <TextBox x:Name="txtCreatorName" Text="Unknown"/>
+                                </StackPanel>
+                            </Grid>
 
                             <TextBlock Text="Expected Sales ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
                                 <TextBlock.ToolTip>
@@ -285,7 +297,13 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                                    <TextBlock Text="Quote #" Foreground="{DynamicResource SecondaryText}"/>
+                                    <TextBlock Text="Quote # ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                        <TextBlock.ToolTip>
+                                            <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                                <TextBlock TextWrapping="Wrap" Text="Bumps up by 1 automatically after printing a Customer copy."/>
+                                            </ToolTip>
+                                        </TextBlock.ToolTip>
+                                    </TextBlock>
                                     <TextBox x:Name="txtQuoteNumber" Text="1001"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Margin="5,0,0,0">
@@ -310,7 +328,7 @@
                                 <Button Grid.Column="1" Content="Browse" Width="70" Height="28" Background="#4A4A4A" Foreground="White" BorderThickness="0" Click="BrowseLogo_Click"/>
                             </Grid>
 
-                            <Grid Margin="0,5,0,10">
+                            <Grid Margin="0,5,0,15">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
@@ -319,8 +337,17 @@
                                 <Button Grid.Column="1" Content="📂 Load Project" Height="30" Margin="5,0,0,0" Background="#0078D7" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="Load_Click"/>
                             </Grid>
 
-                            <Button Content="🖨️ PDF (Internal Copy)" Height="30" Margin="0,0,0,8" Background="#4A4A4A" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="PrintInternal_Click"/>
-                            <Button Content="🖨️ PDF (Customer Quote)" Height="30" Background="#D83B01" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="PrintCustomer_Click"/>
+                            <TextBlock Text="Print Output Type:" Foreground="{DynamicResource PrimaryText}" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <RadioButton x:Name="rbPrintCustomer" Content="Customer Quote" GroupName="PrintMode" IsChecked="True" Foreground="{DynamicResource SecondaryText}" Grid.Column="0"/>
+                                <RadioButton x:Name="rbPrintInternal" Content="Internal Copy" GroupName="PrintMode" Foreground="{DynamicResource SecondaryText}" Grid.Column="1"/>
+                            </Grid>
+
+                            <Button Content="🖨️ Generate PDF" Height="34" Background="#D83B01" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="Print_Click"/>
 
                         </StackPanel>
                     </Border>

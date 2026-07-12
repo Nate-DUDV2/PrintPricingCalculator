@@ -34,8 +34,8 @@ namespace PrintPricingCalculator
                 }
 
                 int[] themeValue = new int[] { isDark ? 1 : 0 };
-                DwmSetWindowAttribute(hwnd, 20, themeValue, 4);
-                DwmSetWindowAttribute(hwnd, 19, themeValue, 4);
+                _ = DwmSetWindowAttribute(hwnd, 20, themeValue, 4);
+                _ = DwmSetWindowAttribute(hwnd, 19, themeValue, 4);
             }
             catch { }
         }
@@ -192,6 +192,7 @@ namespace PrintPricingCalculator
             public string ElecCost { get; set; }
             public string Buffer { get; set; }
             public string LicenseCost { get; set; }
+            public string CreatorName { get; set; }
             public string ExpectedSales { get; set; }
             public string FilamentCost { get; set; }
             public string FilamentReq { get; set; }
@@ -239,6 +240,7 @@ namespace PrintPricingCalculator
                 ElecCost = txtElecCost.Text,
                 Buffer = txtBuffer.Text,
                 LicenseCost = txtLicenseCost.Text,
+                CreatorName = txtCreatorName.Text,
                 ExpectedSales = txtExpectedSales.Text,
                 FilamentCost = txtFilamentCost.Text,
                 FilamentReq = txtFilamentReq.Text,
@@ -261,15 +263,17 @@ namespace PrintPricingCalculator
             {
                 string jsonString = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(saveFileDialog.FileName, jsonString);
-                MessageBox.Show("Quote saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                _ = MessageBox.Show("Quote saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
         private void Load_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "3D Print Quote (*.3dquote)|*.3dquote|JSON File (*.json)|*.json";
-            openFileDialog.Title = "Load Pricing Quote";
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "3D Print Quote (*.3dquote)|*.3dquote|JSON File (*.json)|*.json",
+                Title = "Load Pricing Quote"
+            };
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -292,6 +296,7 @@ namespace PrintPricingCalculator
                     txtElecCost.Text = data.ElecCost;
                     txtBuffer.Text = data.Buffer;
                     txtLicenseCost.Text = data.LicenseCost ?? "0.00";
+                    txtCreatorName.Text = data.CreatorName ?? "Unknown";
                     txtExpectedSales.Text = data.ExpectedSales ?? "1";
                     txtFilamentCost.Text = data.FilamentCost;
                     txtFilamentReq.Text = data.FilamentReq;
@@ -304,10 +309,22 @@ namespace PrintPricingCalculator
                     txtDiscount.Text = data.Discount ?? "0.0";
 
                     string savedMargin = data.SelectedMargin ?? "50";
-                    if (savedMargin == "40") rbMargin40.IsChecked = true;
-                    else if (savedMargin == "50") rbMargin50.IsChecked = true;
-                    else if (savedMargin == "60") rbMargin60.IsChecked = true;
-                    else if (savedMargin == "70") rbMargin70.IsChecked = true;
+                    if (savedMargin == "40")
+                    {
+                        rbMargin40.IsChecked = true;
+                    }
+                    else if (savedMargin == "50")
+                    {
+                        rbMargin50.IsChecked = true;
+                    }
+                    else if (savedMargin == "60")
+                    {
+                        rbMargin60.IsChecked = true;
+                    }
+                    else if (savedMargin == "70")
+                    {
+                        rbMargin70.IsChecked = true;
+                    }
 
                     Calculate_Click(null, null);
                 }
@@ -318,13 +335,11 @@ namespace PrintPricingCalculator
             }
         }
 
-        
         private void AddTableRow(TableRowGroup group, string label, string value, bool isBold = false, Brush color = null, int fontSize = 14)
         {
             TableRow row = new TableRow();
             Paragraph pLabel = new Paragraph(new Run(label)) { Margin = new Thickness(0, 5, 0, 5), FontSize = fontSize };
 
-            
             string safeValue = string.IsNullOrWhiteSpace(value) ? " " : value;
             Paragraph pValue = new Paragraph(new Run(safeValue)) { Margin = new Thickness(0, 5, 0, 5), FontSize = fontSize, TextAlignment = TextAlignment.Right };
 
@@ -339,7 +354,6 @@ namespace PrintPricingCalculator
         private void BuildHeader(FlowDocument doc, string title)
         {
             Table headerTable = new Table();
-            
             headerTable.Columns.Add(new TableColumn() { Width = new GridLength(400) });
             headerTable.Columns.Add(new TableColumn() { Width = new GridLength(250) });
 
@@ -352,7 +366,6 @@ namespace PrintPricingCalculator
             {
                 try
                 {
-                    
                     BitmapImage bitmap = new BitmapImage();
                     bitmap.BeginInit();
                     bitmap.UriSource = new Uri(txtLogoPath.Text, UriKind.Absolute);
@@ -368,10 +381,7 @@ namespace PrintPricingCalculator
 
                     logoCell.Blocks.Add(new BlockUIContainer(logoImg));
                 }
-                catch
-                {
-                    
-                }
+                catch { }
             }
             hRow.Cells.Add(logoCell);
 
@@ -384,7 +394,6 @@ namespace PrintPricingCalculator
             hrg.Rows.Add(hRow);
             doc.Blocks.Add(headerTable);
 
-           
             doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
 
             Paragraph pInfo = new Paragraph() { LineHeight = 22 };
@@ -393,76 +402,15 @@ namespace PrintPricingCalculator
             pInfo.Inlines.Add(new Run("Customer: ") { FontWeight = FontWeights.Bold });
             pInfo.Inlines.Add(new Run(txtCustomerName.Text + "\n"));
             pInfo.Inlines.Add(new Run("Designer: ") { FontWeight = FontWeights.Bold });
-            pInfo.Inlines.Add(new Run(txtDesignerName.Text));
+            pInfo.Inlines.Add(new Run(txtDesignerName.Text + "\n"));
+            pInfo.Inlines.Add(new Run("Model Creator: ") { FontWeight = FontWeights.Bold });
+            pInfo.Inlines.Add(new Run(txtCreatorName.Text));
             doc.Blocks.Add(pInfo);
 
-            
             doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
         }
 
-        private void PrintInternal_Click(object sender, RoutedEventArgs e)
-        {
-            PrintDialog printDialog = new PrintDialog();
-            if (printDialog.ShowDialog() == true)
-            {
-                FlowDocument doc = new FlowDocument();
-
-               
-                doc.PageWidth = 793;
-                doc.PageHeight = 1056;
-                doc.PagePadding = new Thickness(40);
-                doc.ColumnWidth = 713; 
-                doc.FontFamily = new FontFamily("Segoe UI");
-
-                BuildHeader(doc, "INTERNAL QUOTE");
-
-                Table itemsTable = new Table();
-                
-                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
-                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
-
-                TableRowGroup irg = new TableRowGroup();
-                itemsTable.RowGroups.Add(irg);
-
-                AddTableRow(irg, "Materials Cost:", lblMaterialsCost.Text);
-                AddTableRow(irg, "Labor Cost:", lblLaborCost.Text);
-                AddTableRow(irg, "Machine Cost:", lblMachineCost.Text);
-                AddTableRow(irg, "Tax:", lblTaxCost.Text);
-
-                doc.Blocks.Add(itemsTable);
-
-                
-                doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
-
-                Table marginsTable = new Table();
-                marginsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
-                marginsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
-
-                TableRowGroup mrg = new TableRowGroup();
-                marginsTable.RowGroups.Add(mrg);
-
-                AddTableRow(mrg, "Total Landed Cost:", lblLandedCost.Text, true, Brushes.DarkRed, 16);
-                AddTableRow(mrg, "Suggested Retail Pricing:", " ", true, Brushes.Black, 16);
-                AddTableRow(mrg, "40% Margin:", lblMargin40.Text);
-                AddTableRow(mrg, "50% Margin:", lblMargin50.Text);
-                AddTableRow(mrg, "60% Margin:", lblMargin60.Text);
-                AddTableRow(mrg, "70% Margin:", lblMargin70.Text);
-                AddTableRow(mrg, "Applied Discount:", $"{txtDiscount.Text}%");
-
-                doc.Blocks.Add(marginsTable);
-
-               
-                doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
-
-                Paragraph finalP = new Paragraph(new Run($"Final Customer Quote: {lblFinalQuotePrice.Text}")) { FontSize = 20, FontWeight = FontWeights.Bold, Foreground = Brushes.ForestGreen, TextAlignment = TextAlignment.Right };
-                doc.Blocks.Add(finalP);
-
-                IDocumentPaginatorSource idpSource = doc;
-                printDialog.PrintDocument(idpSource.DocumentPaginator, "Internal Quote");
-            }
-        }
-
-        private void PrintCustomer_Click(object sender, RoutedEventArgs e)
+        private void Print_Click(object sender, RoutedEventArgs e)
         {
             PrintDialog printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
@@ -475,59 +423,118 @@ namespace PrintPricingCalculator
                 doc.ColumnWidth = 713;
                 doc.FontFamily = new FontFamily("Segoe UI");
 
-                BuildHeader(doc, "PROJECT QUOTE");
-
-                double landedCost = double.Parse(lblLandedCost.Text, System.Globalization.NumberStyles.Currency);
-                double baseChosenPrice = 0;
-                if (rbMargin40.IsChecked == true)
+                if (rbPrintInternal.IsChecked == true)
                 {
-                    baseChosenPrice = double.Parse(lblMargin40.Text, System.Globalization.NumberStyles.Currency);
+                    BuildHeader(doc, "INTERNAL QUOTE");
+
+                    Table itemsTable = new Table();
+                    itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
+                    itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
+
+                    TableRowGroup irg = new TableRowGroup();
+                    itemsTable.RowGroups.Add(irg);
+
+                    AddTableRow(irg, "Materials Cost:", lblMaterialsCost.Text);
+                    AddTableRow(irg, "Labor Cost:", lblLaborCost.Text);
+                    AddTableRow(irg, "Machine Cost:", lblMachineCost.Text);
+                    AddTableRow(irg, "Tax:", lblTaxCost.Text);
+
+                    doc.Blocks.Add(itemsTable);
+                    doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
+
+                    Table marginsTable = new Table();
+                    marginsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
+                    marginsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
+
+                    TableRowGroup mrg = new TableRowGroup();
+                    marginsTable.RowGroups.Add(mrg);
+
+                    AddTableRow(mrg, "Total Landed Cost:", lblLandedCost.Text, true, Brushes.DarkRed, 16);
+                    AddTableRow(mrg, "Suggested Retail Pricing:", " ", true, Brushes.Black, 16);
+                    AddTableRow(mrg, "40% Margin:", lblMargin40.Text);
+                    AddTableRow(mrg, "50% Margin:", lblMargin50.Text);
+                    AddTableRow(mrg, "60% Margin:", lblMargin60.Text);
+                    AddTableRow(mrg, "70% Margin:", lblMargin70.Text);
+                    AddTableRow(mrg, "Applied Discount:", $"{txtDiscount.Text}%");
+
+                    doc.Blocks.Add(marginsTable);
+                    doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
+
+                    Paragraph finalP = new Paragraph(new Run($"Final Customer Quote: {lblFinalQuotePrice.Text}")) { FontSize = 20, FontWeight = FontWeights.Bold, Foreground = Brushes.ForestGreen, TextAlignment = TextAlignment.Right };
+                    doc.Blocks.Add(finalP);
                 }
-                else if (rbMargin50.IsChecked == true)
+                else
                 {
-                    baseChosenPrice = double.Parse(lblMargin50.Text, System.Globalization.NumberStyles.Currency);
+                    BuildHeader(doc, "PROJECT QUOTE");
+
+                    double landedCost = double.Parse(lblLandedCost.Text, System.Globalization.NumberStyles.Currency);
+                    double baseChosenPrice = 0;
+                    if (rbMargin40.IsChecked == true)
+                    {
+                        baseChosenPrice = double.Parse(lblMargin40.Text, System.Globalization.NumberStyles.Currency);
+                    }
+                    else if (rbMargin50.IsChecked == true)
+                    {
+                        baseChosenPrice = double.Parse(lblMargin50.Text, System.Globalization.NumberStyles.Currency);
+                    }
+                    else if (rbMargin60.IsChecked == true)
+                    {
+                        baseChosenPrice = double.Parse(lblMargin60.Text, System.Globalization.NumberStyles.Currency);
+                    }
+                    else if (rbMargin70.IsChecked == true)
+                    {
+                        baseChosenPrice = double.Parse(lblMargin70.Text, System.Globalization.NumberStyles.Currency);
+                    }
+
+                    double serviceFee = baseChosenPrice - landedCost;
+
+                    Table itemsTable = new Table();
+                    itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
+                    itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
+
+                    TableRowGroup irg = new TableRowGroup();
+                    itemsTable.RowGroups.Add(irg);
+
+                    AddTableRow(irg, "Materials:", lblMaterialsCost.Text);
+                    AddTableRow(irg, "Labor:", lblLaborCost.Text);
+                    AddTableRow(irg, "Machine & Electricity:", lblMachineCost.Text);
+                    AddTableRow(irg, "Tax:", lblTaxCost.Text);
+                    AddTableRow(irg, "Customization & Service:", serviceFee.ToString("C"));
+
+                    double discountPct = double.Parse(txtDiscount.Text);
+                    if (discountPct > 0)
+                    {
+                        AddTableRow(irg, "Discount Applied:", $"-{discountPct}%", true, Brushes.DarkRed);
+                    }
+
+                    doc.Blocks.Add(itemsTable);
+                    doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
+
+                    Paragraph finalP = new Paragraph(new Run($"Total Due: {lblFinalQuotePrice.Text}")) { FontSize = 22, FontWeight = FontWeights.Bold, Foreground = Brushes.ForestGreen, TextAlignment = TextAlignment.Right };
+                    doc.Blocks.Add(finalP);
                 }
-                else if (rbMargin60.IsChecked == true)
+
+                try
                 {
-                    baseChosenPrice = double.Parse(lblMargin60.Text, System.Globalization.NumberStyles.Currency);
+                    IDocumentPaginatorSource idpSource = doc;
+                    printDialog.PrintDocument(idpSource.DocumentPaginator, rbPrintInternal.IsChecked == true ? "Internal Quote" : "Customer Quote");
+
+                  
+                    if (rbPrintCustomer.IsChecked == true && int.TryParse(txtQuoteNumber.Text, out int currentQuoteNum))
+                    {
+                        txtQuoteNumber.Text = (currentQuoteNum + 1).ToString();
+                        try
+                        {
+                            RegistryKey appKey = Registry.CurrentUser.CreateSubKey(@"Software\3BCCreations\PricingCalculator");
+                            appKey.SetValue("DefQuoteNumber", txtQuoteNumber.Text);
+                        }
+                        catch { }
+                    }
                 }
-                else if (rbMargin70.IsChecked == true)
+                catch (Exception ex)
                 {
-                    baseChosenPrice = double.Parse(lblMargin70.Text, System.Globalization.NumberStyles.Currency);
+                    _ = MessageBox.Show("There was an error communicating with the printer.\n\nIf you are printing to a PDF, make sure the destination file is not already open in another program.\n\nError: " + ex.Message, "Print Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-
-                double serviceFee = baseChosenPrice - landedCost;
-
-                Table itemsTable = new Table();
-               
-                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(450) });
-                itemsTable.Columns.Add(new TableColumn() { Width = new GridLength(200) });
-
-                TableRowGroup irg = new TableRowGroup();
-                itemsTable.RowGroups.Add(irg);
-
-                AddTableRow(irg, "Materials:", lblMaterialsCost.Text);
-                AddTableRow(irg, "Labor:", lblLaborCost.Text);
-                AddTableRow(irg, "Machine & Electricity:", lblMachineCost.Text);
-                AddTableRow(irg, "Tax:", lblTaxCost.Text);
-                AddTableRow(irg, "Customization & Service:", serviceFee.ToString("C"));
-
-                double discountPct = double.Parse(txtDiscount.Text);
-                if (discountPct > 0)
-                {
-                    AddTableRow(irg, "Discount Applied:", $"-{discountPct}%", true, Brushes.DarkRed);
-                }
-
-                doc.Blocks.Add(itemsTable);
-
-              
-                doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
-
-                Paragraph finalP = new Paragraph(new Run($"Total Due: {lblFinalQuotePrice.Text}")) { FontSize = 22, FontWeight = FontWeights.Bold, Foreground = Brushes.ForestGreen, TextAlignment = TextAlignment.Right };
-                doc.Blocks.Add(finalP);
-
-                IDocumentPaginatorSource idpSource = doc;
-                printDialog.PrintDocument(idpSource.DocumentPaginator, "Customer Quote");
             }
         }
 
@@ -543,10 +550,12 @@ namespace PrintPricingCalculator
                 appKey.SetValue("DefMaintenance", txtMaintenance.Text);
                 appKey.SetValue("DefPower", txtPower.Text);
                 appKey.SetValue("DefLicenseCost", txtLicenseCost.Text);
+                appKey.SetValue("DefCreatorName", txtCreatorName.Text);
                 appKey.SetValue("DefExpectedSales", txtExpectedSales.Text);
                 appKey.SetValue("DefDesignerName", txtDesignerName.Text);
                 appKey.SetValue("DefTaxRate", txtTaxRate.Text);
                 appKey.SetValue("DefLogoPath", txtLogoPath.Text);
+                appKey.SetValue("DefQuoteNumber", txtQuoteNumber.Text);
 
                 _ = MessageBox.Show("Default rates & logo saved successfully!", "Defaults Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -563,17 +572,70 @@ namespace PrintPricingCalculator
                 RegistryKey appKey = Registry.CurrentUser.OpenSubKey(@"Software\3BCCreations\PricingCalculator");
                 if (appKey != null)
                 {
-                    if (appKey.GetValue("DefElecCost") != null) txtElecCost.Text = appKey.GetValue("DefElecCost").ToString();
-                    if (appKey.GetValue("DefLaborRate") != null) txtLaborRate.Text = appKey.GetValue("DefLaborRate").ToString();
-                    if (appKey.GetValue("DefEfficiency") != null) txtEfficiency.Text = appKey.GetValue("DefEfficiency").ToString();
-                    if (appKey.GetValue("DefPrinterCost") != null) txtPrinterCost.Text = appKey.GetValue("DefPrinterCost").ToString();
-                    if (appKey.GetValue("DefMaintenance") != null) txtMaintenance.Text = appKey.GetValue("DefMaintenance").ToString();
-                    if (appKey.GetValue("DefPower") != null) txtPower.Text = appKey.GetValue("DefPower").ToString();
-                    if (appKey.GetValue("DefLicenseCost") != null) txtLicenseCost.Text = appKey.GetValue("DefLicenseCost").ToString();
-                    if (appKey.GetValue("DefExpectedSales") != null) txtExpectedSales.Text = appKey.GetValue("DefExpectedSales").ToString();
-                    if (appKey.GetValue("DefDesignerName") != null) txtDesignerName.Text = appKey.GetValue("DefDesignerName").ToString();
-                    if (appKey.GetValue("DefTaxRate") != null) txtTaxRate.Text = appKey.GetValue("DefTaxRate").ToString();
-                    if (appKey.GetValue("DefLogoPath") != null) txtLogoPath.Text = appKey.GetValue("DefLogoPath").ToString();
+                    if (appKey.GetValue("DefElecCost") != null)
+                    {
+                        txtElecCost.Text = appKey.GetValue("DefElecCost").ToString();
+                    }
+
+                    if (appKey.GetValue("DefLaborRate") != null)
+                    {
+                        txtLaborRate.Text = appKey.GetValue("DefLaborRate").ToString();
+                    }
+
+                    if (appKey.GetValue("DefEfficiency") != null)
+                    {
+                        txtEfficiency.Text = appKey.GetValue("DefEfficiency").ToString();
+                    }
+
+                    if (appKey.GetValue("DefPrinterCost") != null)
+                    {
+                        txtPrinterCost.Text = appKey.GetValue("DefPrinterCost").ToString();
+                    }
+
+                    if (appKey.GetValue("DefMaintenance") != null)
+                    {
+                        txtMaintenance.Text = appKey.GetValue("DefMaintenance").ToString();
+                    }
+
+                    if (appKey.GetValue("DefPower") != null)
+                    {
+                        txtPower.Text = appKey.GetValue("DefPower").ToString();
+                    }
+
+                    if (appKey.GetValue("DefLicenseCost") != null)
+                    {
+                        txtLicenseCost.Text = appKey.GetValue("DefLicenseCost").ToString();
+                    }
+
+                    if (appKey.GetValue("DefCreatorName") != null)
+                    {
+                        txtCreatorName.Text = appKey.GetValue("DefCreatorName").ToString();
+                    }
+
+                    if (appKey.GetValue("DefExpectedSales") != null)
+                    {
+                        txtExpectedSales.Text = appKey.GetValue("DefExpectedSales").ToString();
+                    }
+
+                    if (appKey.GetValue("DefDesignerName") != null)
+                    {
+                        txtDesignerName.Text = appKey.GetValue("DefDesignerName").ToString();
+                    }
+
+                    if (appKey.GetValue("DefTaxRate") != null)
+                    {
+                        txtTaxRate.Text = appKey.GetValue("DefTaxRate").ToString();
+                    }
+
+                    if (appKey.GetValue("DefLogoPath") != null)
+                    {
+                        txtLogoPath.Text = appKey.GetValue("DefLogoPath").ToString();
+                    }
+
+                    if (appKey.GetValue("DefQuoteNumber") != null)
+                    {
+                        txtQuoteNumber.Text = appKey.GetValue("DefQuoteNumber").ToString();
+                    }
                 }
             }
             catch { }
@@ -595,7 +657,7 @@ namespace PrintPricingCalculator
                 if (appKey != null && appKey.GetValue("IsDarkMode") != null)
                 {
                     int savedMode = (int)appKey.GetValue("IsDarkMode");
-                    chkDarkMode.IsChecked = (savedMode == 1);
+                    chkDarkMode.IsChecked = savedMode == 1;
                 }
                 else
                 {
@@ -603,7 +665,7 @@ namespace PrintPricingCalculator
                     if (winKey != null && winKey.GetValue("AppsUseLightTheme") != null)
                     {
                         int systemLightMode = (int)winKey.GetValue("AppsUseLightTheme");
-                        chkDarkMode.IsChecked = (systemLightMode == 0);
+                        chkDarkMode.IsChecked = systemLightMode == 0;
                     }
                 }
                 DarkMode_Click(null, null);
@@ -621,7 +683,7 @@ namespace PrintPricingCalculator
 
         private void GitHubLogo_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            _ = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "https://github.com/Nate-DUDV2/PrintPricingCalculator",
                 UseShellExecute = true
