@@ -54,3 +54,34 @@ To clone and build the desktop application locally, you will need Git and Visual
 
 ```bash
 git clone [https://github.com/Nate-DUDV2/PrintPricingCalculator.git](https://github.com/Nate-DUDV2/PrintPricingCalculator.git)
+```
+1. Open PrintPricingCalculator.sln in Visual Studio.
+
+2. Set PrintPricingCalculator as the startup project.
+
+3. Press F5 or click Start to build and run
+
+   📝 How to Use
+   
+1. Advanced Inputs (Sidebar): Set shop-wide variables such as electricity rates, hourly labor rate, and machine depreciation factors.
+
+2. Core Inputs: Enter job-specific variables (filament weight/type, print duration, additional hardware).
+
+3. Packaging: Add shipping box costs and postage rates.
+
+4. Auto-Calculate: View total landed costs and profit margins dynamically.
+
+5. Save & Export: Save the project as a .3dquote file or render a PDF invoice for your customer.
+
+
+🏆 Credits & Acknowledgments
+
+3BC Creations — Spreadsheet Wiz 📊 (Original math model & calculator design)
+
+Nates Print Shop — Programmer 💻 (C# & WPF Application Development)
+
+
+📜 License
+This project is open-source and released under the MIT License.
+   
+
