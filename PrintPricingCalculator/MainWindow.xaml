@@ -71,36 +71,36 @@
 
         <Grid Grid.Row="0" Margin="10,5,10,15">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" 
-                Background="Transparent" Cursor="Hand" MouseLeftButtonUp="GitHubLogo_Click" 
-                ToolTip="View Source Code on GitHub">
+                        Background="Transparent" Cursor="Hand" MouseLeftButtonUp="GitHubLogo_Click" 
+                        ToolTip="View Source Code on GitHub">
 
                 <Canvas Width="80" Height="80" Margin="0,0,15,0" VerticalAlignment="Center">
                     <Polygon Points="40,10 66,25 66,55 40,70 14,55 14,25" 
-                     Stroke="#D83B01" StrokeThickness="6" StrokeLineJoin="Round" Fill="Transparent"/>
+                             Stroke="#D83B01" StrokeThickness="6" StrokeLineJoin="Round" Fill="Transparent"/>
                     <Polyline Points="14,25 40,40 66,25" 
-                      Stroke="#D83B01" StrokeThickness="6" StrokeLineJoin="Round" 
-                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
+                              Stroke="#D83B01" StrokeThickness="6" StrokeLineJoin="Round" 
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
                     <Line X1="40" Y1="40" X2="40" Y2="70" 
-                  Stroke="#D83B01" StrokeThickness="6" 
-                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                          Stroke="#D83B01" StrokeThickness="6" 
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                 </Canvas>
 
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Precision Cost Calculator for 3D Printing" 
-                       FontSize="26" FontWeight="Bold" Foreground="{DynamicResource PrimaryText}" FontFamily="Segoe UI"/>
+                               FontSize="26" FontWeight="Bold" Foreground="{DynamicResource PrimaryText}" FontFamily="Segoe UI"/>
 
                     <TextBlock Text="Maximizing profits with effortless accuracy." 
-                       FontSize="14" Foreground="{DynamicResource PrimaryText}" Opacity="0.8" FontFamily="Segoe UI" Margin="0,2,0,0"/>
+                               FontSize="14" Foreground="{DynamicResource PrimaryText}" Opacity="0.8" FontFamily="Segoe UI" Margin="0,2,0,0"/>
 
                     <TextBlock x:Name="lblSubtitle" Text="Your ultimate 3D print quote wizard" 
-                       FontSize="12" Foreground="{DynamicResource PrimaryText}" Opacity="0.5" FontFamily="Segoe UI" Margin="0,2,0,0"/>
+                               FontSize="12" Foreground="{DynamicResource PrimaryText}" Opacity="0.5" FontFamily="Segoe UI" Margin="0,2,0,0"/>
                 </StackPanel>
             </StackPanel>
 
             <CheckBox x:Name="chkDarkMode" Content="🌙 Dark Mode" 
-              HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,15,0,0" 
-              FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryText}" 
-              Click="DarkMode_Click"/>
+                      HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,15,0,0" 
+                      FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryText}" 
+                      Click="DarkMode_Click"/>
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -111,6 +111,7 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- Column 0: Shop & Machine Settings -->
                 <Border Grid.Column="0" Style="{StaticResource CardStyle}" VerticalAlignment="Top" HorizontalAlignment="Stretch">
                     <Expander x:Name="expAdvanced" Header="⚙️ Shop &amp; Machine Settings" Foreground="{DynamicResource PrimaryText}" FontWeight="Bold" FontSize="18" IsExpanded="False">
                         <StackPanel Margin="-15,10,15,0">
@@ -123,25 +124,67 @@
                             </TextBlock>
                             <TextBox x:Name="txtEfficiency" Text="1.10"/>
 
-                            <TextBlock Text="Labor Hourly Rate ($/hr)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Labor Hourly Rate ($/hr) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Your target hourly wage for slicing, machine setup, and post-processing."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtLaborRate" Text="20.0"/>
 
-                            <TextBlock Text="Printer Cost ($)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Printer Cost ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="The initial purchase price of this 3D printer."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtPrinterCost" Text="1000"/>
 
-                            <TextBlock Text="Est. Annual Maintenance ($)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Est. Annual Maintenance ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Estimated yearly maintenance cost (nozzles, build plates, belts, grease)."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtMaintenance" Text="75"/>
 
-                            <TextBlock Text="Estimated Life (yrs)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Estimated Life (yrs) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Expected usable lifespan of the printer in years before replacement."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtLife" Text="3"/>
 
-                            <TextBlock Text="Estimated Uptime (%)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Estimated Uptime (%) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Percentage of total annual hours the machine actively runs (50% = ~12 hrs/day)."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtUptime" Text="50"/>
 
-                            <TextBlock Text="Printer Power (W)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Printer Power (W) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Average wattage consumed by the printer during operation."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtPower" Text="150"/>
 
-                            <TextBlock Text="Electricity Cost ($/KWh)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Electricity Cost ($/KWh) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Your local utility rate per kilowatt-hour."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtElecCost" Text="0.14"/>
 
                             <TextBlock Text="Printer Cost Buffer Factor ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
@@ -172,7 +215,13 @@
                                     <TextBox x:Name="txtLicenseCost" Text="0.00"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                    <TextBlock Text="Creator Name" Foreground="{DynamicResource SecondaryText}"/>
+                                    <TextBlock Text="Creator Name ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                        <TextBlock.ToolTip>
+                                            <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                                <TextBlock TextWrapping="Wrap" Text="Name of the original 3D designer or commercial license holder."/>
+                                            </ToolTip>
+                                        </TextBlock.ToolTip>
+                                    </TextBlock>
                                     <TextBox x:Name="txtCreatorName" Text="Unknown"/>
                                 </StackPanel>
                             </Grid>
@@ -194,39 +243,137 @@
                     </Expander>
                 </Border>
 
+                <!-- Column 1: Core Print Details -->
                 <Border Grid.Column="1" Style="{StaticResource CardStyle}" VerticalAlignment="Top" HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock Text="🖨️ Core Print Details" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource PrimaryText}" Margin="0,0,0,15"/>
 
-                        <TextBlock Text="Filament Cost ($/kg)" Foreground="{DynamicResource SecondaryText}"/>
+                        <TextBlock Text="Filament Cost ($/kg) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Purchase price per 1 kg spool of filament."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtFilamentCost" Text="20.0"/>
 
-                        <TextBlock Text="Total Filament Required (g)" Foreground="{DynamicResource SecondaryText}"/>
+                        <TextBlock Text="Total Filament Required (g) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Weight of filament needed for this model in grams (from slicer)."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtFilamentReq" Text="150"/>
 
-                        <TextBlock Text="Total Printing Time (hr)" Foreground="{DynamicResource SecondaryText}"/>
+                        <TextBlock Text="Total Printing Time (hr) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Estimated print time in hours (from slicer)."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtPrintTime" Text="5.0"/>
 
-                        <TextBlock Text="Total Labor Required (min)" Foreground="{DynamicResource SecondaryText}"/>
+                        <!-- NEW: RUSH & PARALLEL PRINTING ADD-ON -->
+                        <Separator Background="#444" Margin="0,5,0,10"/>
+                        <TextBlock Text="⚡ Production Speed &amp; Allocation" FontSize="15" FontWeight="Bold" Foreground="#D83B01" Margin="0,0,0,8"/>
+
+                        <StackPanel Margin="0,0,0,5">
+                            <RadioButton x:Name="rbStandardSpeed" Content="Standard Speed (1 Printer)" GroupName="RushMode" IsChecked="True" 
+                                         Foreground="{DynamicResource PrimaryText}" Margin="0,2,0,6" Checked="Input_TextChanged"/>
+
+                            <RadioButton x:Name="rbRushMultiPrinter" Content="⚡ Rush Job (Parallel Printers)" GroupName="RushMode" 
+                                         Foreground="#D83B01" FontWeight="Bold" Margin="0,0,0,8" Checked="Input_TextChanged"/>
+                        </StackPanel>
+
+                        <Grid Margin="0,2,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                <TextBlock Text="Printers Used ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                            <TextBlock TextWrapping="Wrap" Text="Number of machines running concurrently to split total print time (e.g., 6 printers)."/>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                                <TextBox x:Name="txtPrinterCount" Text="6"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                                <TextBlock Text="Rush Fee (%) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                            <TextBlock TextWrapping="Wrap" Text="Optional premium markup charged to the client for priority rush queueing."/>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                                <TextBox x:Name="txtRushMarkup" Text="20.0"/>
+                            </StackPanel>
+                        </Grid>
+                        <Separator Background="#444" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Total Labor Required (min) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Total hands-on time in minutes (slicing, bed prep, print removal, post-processing)."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtLaborTime" Text="15"/>
 
-                        <TextBlock Text="Total Extra Hardware Cost ($)" Foreground="{DynamicResource SecondaryText}"/>
+                        <TextBlock Text="Total Extra Hardware Cost ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Cost of non-printed components (heat inserts, screws, magnets, LEDs, bearings, etc.)."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtHardwareCost" Text="0.00"/>
 
-                        <TextBlock Text="Total Packaging Cost ($)" Foreground="{DynamicResource SecondaryText}"/>
+                        <TextBlock Text="Total Packaging Cost ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Cost of boxes, bubble wrap, labels, and packaging materials."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtPackagingCost" Text="1.50"/>
 
-                        <TextBlock Text="Postage/Shipping ($)" Foreground="{DynamicResource SecondaryText}"/>
+                        <TextBlock Text="Postage/Shipping ($) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Estimated shipping or courier costs."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtPostage" Text="4.00"/>
 
-                        <TextBlock Text="Tax Rate (%)" Foreground="{DynamicResource SecondaryText}"/>
+                        <TextBlock Text="Tax Rate (%) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Sales tax rate percentage (e.g., enter 6 for 6%)."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtTaxRate" Text="0.0"/>
 
-                        <TextBlock Text="Discount (%)" Foreground="#107C10" FontWeight="Bold"/>
+                        <TextBlock Text="Discount (%) ❓" Foreground="#107C10" FontWeight="Bold" Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                    <TextBlock TextWrapping="Wrap" Text="Optional percentage discount applied to the final quote."/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                         <TextBox x:Name="txtDiscount" Text="0.0" BorderBrush="#107C10" BorderThickness="2"/>
                     </StackPanel>
                 </Border>
 
+                <!-- Column 2: Final Pricing & Project Quoting -->
                 <StackPanel Grid.Column="2">
                     <Border Style="{StaticResource CardStyle}" HorizontalAlignment="Stretch">
                         <StackPanel>
@@ -307,18 +454,42 @@
                                     <TextBox x:Name="txtQuoteNumber" Text="1001"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                    <TextBlock Text="Customer Name" Foreground="{DynamicResource SecondaryText}"/>
+                                    <TextBlock Text="Customer Name ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                        <TextBlock.ToolTip>
+                                            <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                                <TextBlock TextWrapping="Wrap" Text="Name of the client receiving this quote."/>
+                                            </ToolTip>
+                                        </TextBlock.ToolTip>
+                                    </TextBlock>
                                     <TextBox x:Name="txtCustomerName" Text="Walk-in Customer"/>
                                 </StackPanel>
                             </Grid>
 
-                            <TextBlock Text="Project / Part Name" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Project / Part Name ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Name or description of the part being printed."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtFileName" Text="My Awesome Print"/>
 
-                            <TextBlock Text="Designer / Shop Name" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Designer / Shop Name ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Your shop or business name shown on printed quotes."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <TextBox x:Name="txtDesignerName" Text="Print Shop"/>
 
-                            <TextBlock Text="Shop Logo (For Invoice Prints)" Foreground="{DynamicResource SecondaryText}"/>
+                            <TextBlock Text="Shop Logo (For Invoice Prints) ❓" Foreground="{DynamicResource SecondaryText}" Cursor="Help">
+                                <TextBlock.ToolTip>
+                                    <ToolTip MaxWidth="250" Background="#333" Foreground="White">
+                                        <TextBlock TextWrapping="Wrap" Text="Optional logo file path to print on top of quotes."/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                             <Grid Margin="0,2,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>

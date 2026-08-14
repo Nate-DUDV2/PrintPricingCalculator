@@ -29,7 +29,7 @@
         #print-calculator-app .btn-default:hover { background-color: #5A5A5A; }
         #print-calculator-app .tooltip { position: relative; display: inline-block; cursor: help; }
         #print-calculator-app .tooltip .tooltiptext { visibility: hidden; width: 200px; background-color: #333333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0; transition: opacity 0.2s; font-size: 12px; font-weight: normal; box-shadow: 0px 4px 8px rgba(0,0,0,0.5); pointer-events: none; }
-        #print-calculator-app .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333333 transparent transparent transparent; }
+        #print-calculator-app .tooltip .tooltiptext::after { content: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333333 transparent transparent transparent; }
         #print-calculator-app .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
         #print-calculator-app input[type="radio"] { cursor: pointer; margin-right: 8px; accent-color: #D83B01;}
     </style>
@@ -41,11 +41,11 @@
                 <g transform="translate(20, 20)" stroke="#D83B01" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round">
                     <polygon points="40,10 66,25 66,55 40,70 14,55 14,25" />
                     <polyline points="14,25 40,40 66,25" />
-                    <line x1="40" y1="40" X2="40" Y2="70" />
+                    <line x1="40" y1="40" x2="40" y2="70" />
                 </g>
                 <text x="100" y="45" font-family="'Segoe UI', Tahoma, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF">Precision Cost Calculator for 3D Printing</text>
                 <text x="100" y="75" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#CCCCCC">Maximizing profits with effortless accuracy.</text>
-                <text x="100" y="98" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#888888">Your ultimate 3D print quote wizard | v2.3.0</text>
+                <text x="100" y="98" font-family="'Segoe UI', Tahoma, sans-serif" font-size="16" fill="#888888">Your ultimate 3D print quote wizard | v2.4.1</text>
             </svg>
         </a>
     </div>
@@ -511,12 +511,20 @@
                 html += `</table>`;
             }
 
-            html += `<script>window.print(); window.close();<\/script></body></html>`;
+            // ADDED A SMALL DELAY SO THE BROWSER CAN RENDER THE LOGO IMAGE
+            html += `<script>
+                window.onload = function() {
+                    setTimeout(function() {
+                        window.print();
+                        window.close();
+                    }, 300);
+                };
+            <\/script></body></html>`;
+            
             let printWin = window.open('', '_blank');
             printWin.document.write(html);
             printWin.document.close();
 
-            // AUTO-INCREMENT QUOTE NUMBER (ONLY FOR CUSTOMER MODE)
             if (mode === 'customer') {
                 let currentQuote = parseInt(document.getElementById('txtQuoteNumber').value, 10);
                 if (!isNaN(currentQuote)) {

@@ -1,15 +1,15 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
 using Microsoft.Win32;
-using System.IO;
-using System.Text.Json;
-using System.Windows.Documents;
-using System.Reflection;
 
 namespace PrintPricingCalculator
 {
@@ -28,10 +28,7 @@ namespace PrintPricingCalculator
             try
             {
                 IntPtr hwnd = new WindowInteropHelper(this).EnsureHandle();
-                if (hwnd == IntPtr.Zero)
-                {
-                    return;
-                }
+                if (hwnd == IntPtr.Zero) return;
 
                 int[] themeValue = new int[] { isDark ? 1 : 0 };
                 _ = DwmSetWindowAttribute(hwnd, 20, themeValue, 4);
@@ -40,36 +37,51 @@ namespace PrintPricingCalculator
             catch { }
         }
 
+        // --- HELPER PARSING METHODS FOR USER-FRIENDLY INPUTS ---
+        private double ParseDouble(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return 0;
+            string cleanInput = input.Replace("$", "").Trim();
+            return double.TryParse(cleanInput, out double result) ? result : 0;
+        }
+
+        private double ParsePercent(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return 0;
+            // Strips out any typed '%' sign and converts user whole numbers (e.g., 6) to decimals (0.06)
+            string cleanInput = input.Replace("%", "").Trim();
+            return double.TryParse(cleanInput, out double result) ? result / 100.0 : 0;
+        }
+
         private void Calculate_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                double efficiency = double.Parse(txtEfficiency.Text);
-                double laborRate = double.Parse(txtLaborRate.Text);
-                double printerCost = double.Parse(txtPrinterCost.Text);
-                double maintenance = double.Parse(txtMaintenance.Text);
-                double lifeYears = double.Parse(txtLife.Text);
-                double uptimePct = double.Parse(txtUptime.Text) / 100.0;
-                double powerW = double.Parse(txtPower.Text);
-                double elecCost = double.Parse(txtElecCost.Text);
-                double buffer = double.Parse(txtBuffer.Text);
+                double efficiency = ParseDouble(txtEfficiency.Text);
+                double laborRate = ParseDouble(txtLaborRate.Text);
+                double printerCost = ParseDouble(txtPrinterCost.Text);
+                double maintenance = ParseDouble(txtMaintenance.Text);
+                double lifeYears = ParseDouble(txtLife.Text);
+                double powerW = ParseDouble(txtPower.Text);
+                double elecCost = ParseDouble(txtElecCost.Text);
+                double buffer = ParseDouble(txtBuffer.Text);
 
-                double filCost = double.Parse(txtFilamentCost.Text);
-                double filReq = double.Parse(txtFilamentReq.Text);
-                double printTime = double.Parse(txtPrintTime.Text);
-                double laborTimeMins = double.Parse(txtLaborTime.Text);
-                double hardwareCost = double.Parse(txtHardwareCost.Text);
-                double packagingCost = double.Parse(txtPackagingCost.Text);
-                double postage = double.Parse(txtPostage.Text);
-                double taxPct = double.Parse(txtTaxRate.Text) / 100.0;
-                double discountPct = double.Parse(txtDiscount.Text) / 100.0;
+                double filCost = ParseDouble(txtFilamentCost.Text);
+                double filReq = ParseDouble(txtFilamentReq.Text);
+                double printTime = ParseDouble(txtPrintTime.Text);
+                double laborTimeMins = ParseDouble(txtLaborTime.Text);
+                double hardwareCost = ParseDouble(txtHardwareCost.Text);
+                double packagingCost = ParseDouble(txtPackagingCost.Text);
+                double postage = ParseDouble(txtPostage.Text);
 
-                double licenseCost = double.Parse(txtLicenseCost.Text);
-                double expectedSales = double.Parse(txtExpectedSales.Text);
-                if (expectedSales <= 0)
-                {
-                    expectedSales = 1;
-                }
+                // Consistent Percentage Inputs
+                double uptimePct = ParsePercent(txtUptime.Text);
+                double taxPct = ParsePercent(txtTaxRate.Text);
+                double discountPct = ParsePercent(txtDiscount.Text);
+
+                double licenseCost = ParseDouble(txtLicenseCost.Text);
+                double expectedSales = ParseDouble(txtExpectedSales.Text);
+                if (expectedSales <= 0) expectedSales = 1;
 
                 double appliedLicenseCost = licenseCost / expectedSales;
 
@@ -89,6 +101,18 @@ namespace PrintPricingCalculator
                 double taxAmount = preTaxCost * taxPct;
                 double landedCost = preTaxCost + taxAmount;
 
+                // --- NEW RUSH JOB LOGIC ---
+                bool isRush = rbRushMultiPrinter.IsChecked ?? false;
+                int printerCount = int.TryParse(txtPrinterCount.Text, out int count) ? Math.Max(1, count) : 1;
+                double rushMarkupPct = ParsePercent(txtRushMarkup.Text);
+
+                if (isRush)
+                {
+                    // Apply rush markup to the landed cost as requested
+                    double wallClockTime = printTime / printerCount; // Optional: use this elsewhere if needed for UI display
+                    landedCost += landedCost * rushMarkupPct;
+                }
+
                 lblMaterialsCost.Text = totalMaterials.ToString("C");
                 lblLaborCost.Text = totalLabor.ToString("C");
                 lblMachineCost.Text = machineCostTotal.ToString("C");
@@ -106,22 +130,10 @@ namespace PrintPricingCalculator
                 lblMargin70.Text = price70.ToString("C");
 
                 double selectedBasePrice = 0;
-                if (rbMargin40.IsChecked == true)
-                {
-                    selectedBasePrice = price40;
-                }
-                else if (rbMargin50.IsChecked == true)
-                {
-                    selectedBasePrice = price50;
-                }
-                else if (rbMargin60.IsChecked == true)
-                {
-                    selectedBasePrice = price60;
-                }
-                else if (rbMargin70.IsChecked == true)
-                {
-                    selectedBasePrice = price70;
-                }
+                if (rbMargin40.IsChecked == true) selectedBasePrice = price40;
+                else if (rbMargin50.IsChecked == true) selectedBasePrice = price50;
+                else if (rbMargin60.IsChecked == true) selectedBasePrice = price60;
+                else if (rbMargin70.IsChecked == true) selectedBasePrice = price70;
 
                 double finalCustomerPrice = selectedBasePrice * (1.0 - discountPct);
                 lblFinalQuotePrice.Text = finalCustomerPrice.ToString("C");
@@ -204,25 +216,19 @@ namespace PrintPricingCalculator
             public string TaxRate { get; set; }
             public string Discount { get; set; }
             public string SelectedMargin { get; set; }
+
+            // --- ADDED NEW FIELDS FOR SAVE/LOAD ---
+            public bool IsRush { get; set; }
+            public string PrinterCount { get; set; }
+            public string RushMarkup { get; set; }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             string marginSelection = "50";
-            if (rbMargin40.IsChecked == true)
-            {
-                marginSelection = "40";
-            }
-
-            if (rbMargin60.IsChecked == true)
-            {
-                marginSelection = "60";
-            }
-
-            if (rbMargin70.IsChecked == true)
-            {
-                marginSelection = "70";
-            }
+            if (rbMargin40.IsChecked == true) marginSelection = "40";
+            if (rbMargin60.IsChecked == true) marginSelection = "60";
+            if (rbMargin70.IsChecked == true) marginSelection = "70";
 
             QuoteData data = new QuoteData
             {
@@ -251,7 +257,12 @@ namespace PrintPricingCalculator
                 Postage = txtPostage.Text,
                 TaxRate = txtTaxRate.Text,
                 Discount = txtDiscount.Text,
-                SelectedMargin = marginSelection
+                SelectedMargin = marginSelection,
+
+                // --- SAVE RUSH FIELDS ---
+                IsRush = rbRushMultiPrinter.IsChecked ?? false,
+                PrinterCount = txtPrinterCount.Text,
+                RushMarkup = txtRushMarkup.Text
             };
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -308,23 +319,17 @@ namespace PrintPricingCalculator
                     txtTaxRate.Text = data.TaxRate ?? "0.0";
                     txtDiscount.Text = data.Discount ?? "0.0";
 
+                    // --- LOAD RUSH FIELDS ---
+                    if (data.IsRush) rbRushMultiPrinter.IsChecked = true;
+                    else rbStandardSpeed.IsChecked = true;
+                    txtPrinterCount.Text = data.PrinterCount ?? "6";
+                    txtRushMarkup.Text = data.RushMarkup ?? "20";
+
                     string savedMargin = data.SelectedMargin ?? "50";
-                    if (savedMargin == "40")
-                    {
-                        rbMargin40.IsChecked = true;
-                    }
-                    else if (savedMargin == "50")
-                    {
-                        rbMargin50.IsChecked = true;
-                    }
-                    else if (savedMargin == "60")
-                    {
-                        rbMargin60.IsChecked = true;
-                    }
-                    else if (savedMargin == "70")
-                    {
-                        rbMargin70.IsChecked = true;
-                    }
+                    if (savedMargin == "40") rbMargin40.IsChecked = true;
+                    else if (savedMargin == "50") rbMargin50.IsChecked = true;
+                    else if (savedMargin == "60") rbMargin60.IsChecked = true;
+                    else if (savedMargin == "70") rbMargin70.IsChecked = true;
 
                     Calculate_Click(null, null);
                 }
@@ -401,6 +406,14 @@ namespace PrintPricingCalculator
             pInfo.Inlines.Add(new Run(txtFileName.Text + "\n"));
             pInfo.Inlines.Add(new Run("Customer: ") { FontWeight = FontWeights.Bold });
             pInfo.Inlines.Add(new Run(txtCustomerName.Text + "\n"));
+
+            // Added Rush indicator visually to the generated quote
+            if (rbRushMultiPrinter.IsChecked == true)
+            {
+                pInfo.Inlines.Add(new Run("Speed: ") { FontWeight = FontWeights.Bold });
+                pInfo.Inlines.Add(new Run($"RUSH ({txtPrinterCount.Text} Printers)\n") { Foreground = Brushes.DarkOrange, FontWeight = FontWeights.Bold });
+            }
+
             pInfo.Inlines.Add(new Run("Designer: ") { FontWeight = FontWeights.Bold });
             pInfo.Inlines.Add(new Run(txtDesignerName.Text + "\n"));
             pInfo.Inlines.Add(new Run("Model Creator: ") { FontWeight = FontWeights.Bold });
@@ -449,13 +462,19 @@ namespace PrintPricingCalculator
                     TableRowGroup mrg = new TableRowGroup();
                     marginsTable.RowGroups.Add(mrg);
 
+                    // Added a row reflecting the applied markup on internal printouts
+                    if (rbRushMultiPrinter.IsChecked == true)
+                    {
+                        AddTableRow(mrg, "Applied Rush Markup:", $"{txtRushMarkup.Text.Replace("%", "")}%", true, Brushes.DarkOrange, 14);
+                    }
+
                     AddTableRow(mrg, "Total Landed Cost:", lblLandedCost.Text, true, Brushes.DarkRed, 16);
                     AddTableRow(mrg, "Suggested Retail Pricing:", " ", true, Brushes.Black, 16);
                     AddTableRow(mrg, "40% Margin:", lblMargin40.Text);
                     AddTableRow(mrg, "50% Margin:", lblMargin50.Text);
                     AddTableRow(mrg, "60% Margin:", lblMargin60.Text);
                     AddTableRow(mrg, "70% Margin:", lblMargin70.Text);
-                    AddTableRow(mrg, "Applied Discount:", $"{txtDiscount.Text}%");
+                    AddTableRow(mrg, "Applied Discount:", $"{txtDiscount.Text.Replace("%", "")}%");
 
                     doc.Blocks.Add(marginsTable);
                     doc.Blocks.Add(new Paragraph(new Run(new string('_', 100))) { Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 0, 10) });
@@ -467,24 +486,12 @@ namespace PrintPricingCalculator
                 {
                     BuildHeader(doc, "PROJECT QUOTE");
 
-                    double landedCost = double.Parse(lblLandedCost.Text, System.Globalization.NumberStyles.Currency);
+                    double landedCost = ParseDouble(lblLandedCost.Text);
                     double baseChosenPrice = 0;
-                    if (rbMargin40.IsChecked == true)
-                    {
-                        baseChosenPrice = double.Parse(lblMargin40.Text, System.Globalization.NumberStyles.Currency);
-                    }
-                    else if (rbMargin50.IsChecked == true)
-                    {
-                        baseChosenPrice = double.Parse(lblMargin50.Text, System.Globalization.NumberStyles.Currency);
-                    }
-                    else if (rbMargin60.IsChecked == true)
-                    {
-                        baseChosenPrice = double.Parse(lblMargin60.Text, System.Globalization.NumberStyles.Currency);
-                    }
-                    else if (rbMargin70.IsChecked == true)
-                    {
-                        baseChosenPrice = double.Parse(lblMargin70.Text, System.Globalization.NumberStyles.Currency);
-                    }
+                    if (rbMargin40.IsChecked == true) baseChosenPrice = ParseDouble(lblMargin40.Text);
+                    else if (rbMargin50.IsChecked == true) baseChosenPrice = ParseDouble(lblMargin50.Text);
+                    else if (rbMargin60.IsChecked == true) baseChosenPrice = ParseDouble(lblMargin60.Text);
+                    else if (rbMargin70.IsChecked == true) baseChosenPrice = ParseDouble(lblMargin70.Text);
 
                     double serviceFee = baseChosenPrice - landedCost;
 
@@ -499,12 +506,18 @@ namespace PrintPricingCalculator
                     AddTableRow(irg, "Labor:", lblLaborCost.Text);
                     AddTableRow(irg, "Machine & Electricity:", lblMachineCost.Text);
                     AddTableRow(irg, "Tax:", lblTaxCost.Text);
+
+                    if (rbRushMultiPrinter.IsChecked == true)
+                    {
+                        AddTableRow(irg, "Rush Expediting Fee Included", "", false, Brushes.DarkOrange);
+                    }
+
                     AddTableRow(irg, "Customization & Service:", serviceFee.ToString("C"));
 
-                    double discountPct = double.Parse(txtDiscount.Text);
-                    if (discountPct > 0)
+                    double discountDisplay = ParseDouble(txtDiscount.Text.Replace("%", ""));
+                    if (discountDisplay > 0)
                     {
-                        AddTableRow(irg, "Discount Applied:", $"-{discountPct}%", true, Brushes.DarkRed);
+                        AddTableRow(irg, "Discount Applied:", $"-{discountDisplay}%", true, Brushes.DarkRed);
                     }
 
                     doc.Blocks.Add(itemsTable);
@@ -519,7 +532,6 @@ namespace PrintPricingCalculator
                     IDocumentPaginatorSource idpSource = doc;
                     printDialog.PrintDocument(idpSource.DocumentPaginator, rbPrintInternal.IsChecked == true ? "Internal Quote" : "Customer Quote");
 
-                  
                     if (rbPrintCustomer.IsChecked == true && int.TryParse(txtQuoteNumber.Text, out int currentQuoteNum))
                     {
                         txtQuoteNumber.Text = (currentQuoteNum + 1).ToString();
@@ -557,6 +569,10 @@ namespace PrintPricingCalculator
                 appKey.SetValue("DefLogoPath", txtLogoPath.Text);
                 appKey.SetValue("DefQuoteNumber", txtQuoteNumber.Text);
 
+                // --- ADDED RUSH FIELDS TO DEFAULT SAVE ---
+                appKey.SetValue("DefPrinterCount", txtPrinterCount.Text);
+                appKey.SetValue("DefRushMarkup", txtRushMarkup.Text);
+
                 _ = MessageBox.Show("Default rates & logo saved successfully!", "Defaults Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -572,70 +588,23 @@ namespace PrintPricingCalculator
                 RegistryKey appKey = Registry.CurrentUser.OpenSubKey(@"Software\3BCCreations\PricingCalculator");
                 if (appKey != null)
                 {
-                    if (appKey.GetValue("DefElecCost") != null)
-                    {
-                        txtElecCost.Text = appKey.GetValue("DefElecCost").ToString();
-                    }
+                    if (appKey.GetValue("DefElecCost") != null) txtElecCost.Text = appKey.GetValue("DefElecCost").ToString();
+                    if (appKey.GetValue("DefLaborRate") != null) txtLaborRate.Text = appKey.GetValue("DefLaborRate").ToString();
+                    if (appKey.GetValue("DefEfficiency") != null) txtEfficiency.Text = appKey.GetValue("DefEfficiency").ToString();
+                    if (appKey.GetValue("DefPrinterCost") != null) txtPrinterCost.Text = appKey.GetValue("DefPrinterCost").ToString();
+                    if (appKey.GetValue("DefMaintenance") != null) txtMaintenance.Text = appKey.GetValue("DefMaintenance").ToString();
+                    if (appKey.GetValue("DefPower") != null) txtPower.Text = appKey.GetValue("DefPower").ToString();
+                    if (appKey.GetValue("DefLicenseCost") != null) txtLicenseCost.Text = appKey.GetValue("DefLicenseCost").ToString();
+                    if (appKey.GetValue("DefCreatorName") != null) txtCreatorName.Text = appKey.GetValue("DefCreatorName").ToString();
+                    if (appKey.GetValue("DefExpectedSales") != null) txtExpectedSales.Text = appKey.GetValue("DefExpectedSales").ToString();
+                    if (appKey.GetValue("DefDesignerName") != null) txtDesignerName.Text = appKey.GetValue("DefDesignerName").ToString();
+                    if (appKey.GetValue("DefTaxRate") != null) txtTaxRate.Text = appKey.GetValue("DefTaxRate").ToString();
+                    if (appKey.GetValue("DefLogoPath") != null) txtLogoPath.Text = appKey.GetValue("DefLogoPath").ToString();
+                    if (appKey.GetValue("DefQuoteNumber") != null) txtQuoteNumber.Text = appKey.GetValue("DefQuoteNumber").ToString();
 
-                    if (appKey.GetValue("DefLaborRate") != null)
-                    {
-                        txtLaborRate.Text = appKey.GetValue("DefLaborRate").ToString();
-                    }
-
-                    if (appKey.GetValue("DefEfficiency") != null)
-                    {
-                        txtEfficiency.Text = appKey.GetValue("DefEfficiency").ToString();
-                    }
-
-                    if (appKey.GetValue("DefPrinterCost") != null)
-                    {
-                        txtPrinterCost.Text = appKey.GetValue("DefPrinterCost").ToString();
-                    }
-
-                    if (appKey.GetValue("DefMaintenance") != null)
-                    {
-                        txtMaintenance.Text = appKey.GetValue("DefMaintenance").ToString();
-                    }
-
-                    if (appKey.GetValue("DefPower") != null)
-                    {
-                        txtPower.Text = appKey.GetValue("DefPower").ToString();
-                    }
-
-                    if (appKey.GetValue("DefLicenseCost") != null)
-                    {
-                        txtLicenseCost.Text = appKey.GetValue("DefLicenseCost").ToString();
-                    }
-
-                    if (appKey.GetValue("DefCreatorName") != null)
-                    {
-                        txtCreatorName.Text = appKey.GetValue("DefCreatorName").ToString();
-                    }
-
-                    if (appKey.GetValue("DefExpectedSales") != null)
-                    {
-                        txtExpectedSales.Text = appKey.GetValue("DefExpectedSales").ToString();
-                    }
-
-                    if (appKey.GetValue("DefDesignerName") != null)
-                    {
-                        txtDesignerName.Text = appKey.GetValue("DefDesignerName").ToString();
-                    }
-
-                    if (appKey.GetValue("DefTaxRate") != null)
-                    {
-                        txtTaxRate.Text = appKey.GetValue("DefTaxRate").ToString();
-                    }
-
-                    if (appKey.GetValue("DefLogoPath") != null)
-                    {
-                        txtLogoPath.Text = appKey.GetValue("DefLogoPath").ToString();
-                    }
-
-                    if (appKey.GetValue("DefQuoteNumber") != null)
-                    {
-                        txtQuoteNumber.Text = appKey.GetValue("DefQuoteNumber").ToString();
-                    }
+                    // --- ADDED RUSH FIELDS TO DEFAULT LOAD ---
+                    if (appKey.GetValue("DefPrinterCount") != null) txtPrinterCount.Text = appKey.GetValue("DefPrinterCount").ToString();
+                    if (appKey.GetValue("DefRushMarkup") != null) txtRushMarkup.Text = appKey.GetValue("DefRushMarkup").ToString();
                 }
             }
             catch { }
